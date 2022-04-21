@@ -73,6 +73,9 @@ object Dependencies {
     const val moshi_code_gen = "com.squareup.moshi:moshi-kotlin-codegen:${Versions.moshi}"
     const val leak_canary = "com.squareup.leakcanary:leakcanary-android:${Versions.leak_canary}"
 
+    const val glide = "com.github.bumptech.glide:glide:${Versions.glide}"
+    const val glide_kapt = "com.github.bumptech.glide:compiler:${Versions.glide_kapt}"
+
     // Threeten backport
     const val threetenbp = "com.jakewharton.threetenabp:threetenabp:${Versions.threetenbp}"
 

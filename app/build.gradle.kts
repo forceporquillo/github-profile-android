@@ -89,6 +89,9 @@ dependencies {
     implementation(Dependencies.lifecycle)
     implementation(Dependencies.fragment_ktx)
 
+    implementation(Dependencies.glide)
+    kapt(Dependencies.glide_kapt)
+
     // Toggle switch
     implementation(Dependencies.toggle)
 

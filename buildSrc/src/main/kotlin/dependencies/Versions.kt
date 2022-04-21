@@ -73,4 +73,7 @@ object Versions {
     const val accompanist_pager = "0.23.0"
 
     const val toggle = "1.1.0"
+
+    const val glide = "4.13.1"
+    const val glide_kapt = "4.12.0"
 }
