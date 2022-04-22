@@ -26,6 +26,9 @@ object Dependencies {
     // Fragment
     const val fragment_ktx = "androidx.fragment:fragment-ktx:${Versions.fragment_ktx}"
 
+    // SwipeRefresh
+    const val swiperefresh = "androidx.swiperefreshlayout:swiperefreshlayout:${Versions.swipefresh}"
+
     // Lifecycle
     const val lifecycle = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle}"
     const val livedata_ktx = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle}"

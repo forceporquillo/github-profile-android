@@ -7,15 +7,15 @@ object Versions {
     const val navigation = "2.4.0"
     const val navigation_hilt = "1.0.0"
     const val app_compat = "1.4.0"
-    const val material = "1.4.0"
+    const val material = "1.5.0"
     const val lifecycle = "2.4.0"
     const val fragment_ktx = "1.3.5"
-    const val overscroll = "1.1.1"
+    const val swipefresh = "1.1.0"
     const val constraint = "2.1.2"
     const val legacy_support = "1.0.0"
 
     const val coroutines = "1.6.1"
-    const val kotlin_stdlib = "1.6.1"
+    const val kotlin_stdlib = "1.6.10"
 
     const val app_initializers = "1.1.0"
 
@@ -63,7 +63,7 @@ object Versions {
     const val compose_navigation = "2.4.2"
 
     // todo replace when stable
-    const val compose_paging = "1.0.0-alpha"
+    const val compose_paging = "1.0.0-alpha14"
     const val compose_coil = "2.0.0-rc03"
 
     const val compose_hilt_navigation = "1.0.0"

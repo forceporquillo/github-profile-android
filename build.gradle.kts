@@ -5,8 +5,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import dependencies.Dependencies
-import dependencies.TestDependencies
 import extensions.applyDefaults
 
 /* BUILD SCRIPT */
