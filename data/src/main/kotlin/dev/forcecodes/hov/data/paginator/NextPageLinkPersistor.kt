@@ -62,10 +62,13 @@ class NextPageLinkStore @Inject constructor(
         linkPreference.nextPage = INITIAL_PAGE
     }
 
-    override fun isEqual(index: Int) {
+    override fun isEqual(index: Int): Boolean {
         val page = nextPage()
-        if (page == index) {
+        return if (page == index) {
             takeMaxAndStore(page + 1)
+            true
+        } else {
+            false
         }
     }
 
