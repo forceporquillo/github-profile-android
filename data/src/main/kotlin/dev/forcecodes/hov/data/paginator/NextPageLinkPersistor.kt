@@ -62,6 +62,13 @@ class NextPageLinkStore @Inject constructor(
         linkPreference.nextPage = INITIAL_PAGE
     }
 
+    override fun isEqual(index: Int) {
+        val page = nextPage()
+        if (page == index) {
+            takeMaxAndStore(page + 1)
+        }
+    }
+
     companion object {
         private const val INITIAL_PAGE = 0
     }

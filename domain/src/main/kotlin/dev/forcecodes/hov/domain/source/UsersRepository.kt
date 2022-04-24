@@ -40,10 +40,7 @@ class UserRepositoryImpl @Inject constructor(
     ): Flow<Result<List<UserEntity>>> = conflateResource(
         cacheSource = { userLocalDataSource.getUserFlow() },
         remoteSource = { githubRemoteDataSource.getUsers(since, maxSize) },
-        saveFetchResult = { list ->
-            Logger.e("saving result $list")
-            userLocalDataSource.saveUsers(userEntityMapper.invoke(list))
-                          },
+        saveFetchResult = { list -> userLocalDataSource.saveUsers(userEntityMapper.invoke(list)) },
         shouldFetch = { cache ->
             // fetch only when db cache is empty or we
             // forcibly invoked to invalidate
