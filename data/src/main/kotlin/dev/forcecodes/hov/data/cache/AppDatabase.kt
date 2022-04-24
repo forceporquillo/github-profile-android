@@ -8,19 +8,22 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
+import dev.forcecodes.hov.data.cache.entity.UserDetailsEntity
 import dev.forcecodes.hov.data.cache.entity.UserEntity
 
 @Database(
     entities = [
         UserEntity::class,
-        SinceKeys::class
+        SinceKeys::class,
+        UserDetailsEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
+    abstract fun userDetails(): DetailsDao
     abstract fun sincePagerIndexDao(): SincePagerIndexDao
 }
 

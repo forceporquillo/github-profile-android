@@ -27,4 +27,8 @@ object PersistenceModule {
     @Singleton
     @Provides
     fun providesUserDao(@InternalApi appDatabase: AppDatabase) = appDatabase.userDao()
+
+    @Singleton
+    @Provides
+    fun providesUserDetailsDao(@InternalApi appDatabase: AppDatabase) = appDatabase.userDetails()
 }

@@ -1,7 +1,6 @@
 package dev.forcecodes.hov.domain.source
 
 import dev.forcecodes.hov.core.Result
-import dev.forcecodes.hov.core.internal.Logger
 import dev.forcecodes.hov.data.api.GithubRemoteDataSource
 import dev.forcecodes.hov.data.api.conflateResource
 import dev.forcecodes.hov.data.cache.LocalUserDataSource

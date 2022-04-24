@@ -1,5 +1,6 @@
 package dev.forcecodes.hov.data.api
 
+import dev.forcecodes.hov.data.api.models.UserDetailsResponse
 import dev.forcecodes.hov.data.api.models.UserResponse
 import dev.forcecodes.hov.data.internal.GithubApi
 import javax.inject.Inject
@@ -19,4 +20,11 @@ class GithubRemoteDataSource @Inject constructor(
 
     }
 
+    suspend fun getDetails(
+        name: String
+    ): ApiResponse<UserDetailsResponse> {
+        return getResponse {
+            githubApiService.getDetails(name)
+        }
+    }
 }
