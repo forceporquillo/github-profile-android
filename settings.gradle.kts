@@ -1,2 +1,3 @@
-rootProject.name = "My Application"
+rootProject.name = "CodeAssignment"
 include(":app")
+include(":domain")
