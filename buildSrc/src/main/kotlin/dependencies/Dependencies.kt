@@ -26,6 +26,9 @@ object Dependencies {
     // Fragment
     const val fragment_ktx = "androidx.fragment:fragment-ktx:${Versions.fragment_ktx}"
 
+    // SwipeRefresh
+    const val swiperefresh = "androidx.swiperefreshlayout:swiperefreshlayout:${Versions.swipefresh}"
+
     // Lifecycle
     const val lifecycle = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle}"
     const val livedata_ktx = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle}"
@@ -73,6 +76,9 @@ object Dependencies {
     const val moshi_code_gen = "com.squareup.moshi:moshi-kotlin-codegen:${Versions.moshi}"
     const val leak_canary = "com.squareup.leakcanary:leakcanary-android:${Versions.leak_canary}"
 
+    const val glide = "com.github.bumptech.glide:glide:${Versions.glide}"
+    const val glide_kapt = "com.github.bumptech.glide:compiler:${Versions.glide_kapt}"
+
     // Threeten backport
     const val threetenbp = "com.jakewharton.threetenabp:threetenabp:${Versions.threetenbp}"
 
@@ -91,7 +97,7 @@ object Dependencies {
     const val accompanist_systemuicontroller = "com.google.accompanist:accompanist-systemuicontroller:${Versions.accompanist_sysui}"
     const val accompanist_swipe_refresh = "com.google.accompanist:accompanist-swiperefresh:${Versions.accompanist_swiperefresh}"
     const val accompanist_pager = "com.google.accompanist:accompanist-pager:${Versions.accompanist_pager}"
-    const val accompanist_pager_indicator = "com.google.accompanist:accompanist-pager-indicator:${Versions.accompanist_pager}"
+    const val accompanist_pager_indicator = "com.google.accompanist:accompanist-pager-indicators:${Versions.accompanist_pager}"
 
     // Toggle
     const val toggle = "com.github.angads25:toggle:${Versions.toggle}"

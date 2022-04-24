@@ -1,6 +1,7 @@
 import dependencies.Dependencies
 import dependencies.TestDependencies
 import dependencies.Versions
+import extensions.applyRequiredInjectDeps
 
 plugins {
     id(Plugins.android)
@@ -54,6 +55,7 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        dataBinding = true
     }
 
     composeOptions {
@@ -69,9 +71,11 @@ android {
 
 dependencies {
 
+    // Core
     implementation(Dependencies.core_kt)
     implementation(Dependencies.app_compat)
     implementation(Dependencies.material)
+    implementation(Dependencies.startup_initializers)
 
     // Compose
     implementation(Dependencies.compose_ui)
@@ -82,12 +86,23 @@ dependencies {
     implementation(Dependencies.compose_hilt_navigation)
     implementation(Dependencies.compose_coil_kt)
     implementation(Dependencies.compose_foundation)
+    implementation(Dependencies.compose_paging)
+
+    // Accompanist
+    implementation(Dependencies.accompanist_pager)
+    implementation(Dependencies.accompanist_pager_indicator)
+    implementation(Dependencies.accompanist_systemuicontroller)
+    implementation(Dependencies.accompanist_swipe_refresh)
 
     implementation(Dependencies.navigation)
     implementation(Dependencies.navigation_ui_ktx)
     implementation(Dependencies.lifecycle_runtime_ktx)
     implementation(Dependencies.lifecycle)
     implementation(Dependencies.fragment_ktx)
+    implementation(Dependencies.swiperefresh)
+
+    implementation(Dependencies.glide)
+    kapt(Dependencies.glide_kapt)
 
     // Toggle switch
     implementation(Dependencies.toggle)
@@ -103,6 +118,8 @@ dependencies {
     androidTestImplementation(Dependencies.hilt_android_test)
     androidTestImplementation(TestDependencies.compose_ui_junit)
     debugImplementation(TestDependencies.compose_tooling_test)
+
+    applyRequiredInjectDeps()
 }
 
 fun getSemanticAppVersionName(): String {

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="spacing_normal">16dp</dimen>
+    <dimen name="spacing_medium">12dp</dimen>
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_small_2">6dp</dimen>
+    <dimen name="spacing_large">20dp</dimen>
+
+    <dimen name="user_profile_size">72dp</dimen>
+
+    <dimen name="text_size_h5">28sp</dimen>
+    <dimen name="text_size_h4">24sp</dimen>
+    <dimen name="text_size_h1">22sp</dimen>
+    <dimen name="text_size_h2">20sp</dimen>
+    <dimen name="text_size_h3">18sp</dimen>
+    <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_medium">14sp</dimen>
+    <dimen name="text_size_regular">16sp</dimen>
+
+    <dimen name="button_height_default">56dp</dimen>
+    <dimen name="github_icon_size">28dp</dimen>
+
+</resources>
