@@ -9,6 +9,7 @@ fun DependencyHandler.applyRequiredInjectDeps() {
     implementation(Dependencies.room_ktx)
 
     implementation(Dependencies.retrofit)
+    implementation(Dependencies.okhttp_urlconnection)
     implementation(Dependencies.moshi_converter)
     implementation(Dependencies.okhttp)
     implementation(Dependencies.okhttp_logging)

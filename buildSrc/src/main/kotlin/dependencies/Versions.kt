@@ -39,7 +39,7 @@ object Versions {
     const val rxjava3_kotlin = "3.0.1"
 
     // Timber
-    const val timber = "4.7.1"
+    const val timber = "5.0.1"
 
     // Paging
     const val paging = "3.1.1"

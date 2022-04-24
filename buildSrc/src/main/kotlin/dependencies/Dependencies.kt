@@ -97,7 +97,7 @@ object Dependencies {
     const val accompanist_systemuicontroller = "com.google.accompanist:accompanist-systemuicontroller:${Versions.accompanist_sysui}"
     const val accompanist_swipe_refresh = "com.google.accompanist:accompanist-swiperefresh:${Versions.accompanist_swiperefresh}"
     const val accompanist_pager = "com.google.accompanist:accompanist-pager:${Versions.accompanist_pager}"
-    const val accompanist_pager_indicator = "com.google.accompanist:accompanist-pager-indicator:${Versions.accompanist_pager}"
+    const val accompanist_pager_indicator = "com.google.accompanist:accompanist-pager-indicators:${Versions.accompanist_pager}"
 
     // Toggle
     const val toggle = "com.github.angads25:toggle:${Versions.toggle}"
