@@ -1,7 +1,13 @@
-package dev.forcecodes.hov.data.api
+package dev.forcecodes.hov.domain.source
 
 import dev.forcecodes.hov.core.Result
 import dev.forcecodes.hov.core.internal.Logger
+import dev.forcecodes.hov.data.api.ApiErrorResponse
+import dev.forcecodes.hov.data.api.ApiResponse
+import dev.forcecodes.hov.data.api.EmptyResponseException
+import dev.forcecodes.hov.data.api.onEmpty
+import dev.forcecodes.hov.data.api.onError
+import dev.forcecodes.hov.data.api.onSuccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
