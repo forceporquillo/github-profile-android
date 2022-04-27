@@ -62,7 +62,6 @@ class DetailsRepositoryImpl @Inject constructor(
         name: String,
         config: PagingConfig
     ): Flow<PagingData<RepositoryEntity>> {
-        var previousRemoteKeyIndex: KeyIndex? = null
         return Pager(
             config = config,
             remoteMediator = PagedKeyRemoteMediator(
@@ -88,13 +87,7 @@ class DetailsRepositoryImpl @Inject constructor(
                     )
                 },
                 findKeyDelegate = {
-                    val index = keyIndexDao.remoteKeysRepoId(it.id, "$name:repos")
-                    return@PagedKeyRemoteMediator if (previousRemoteKeyIndex == index) {
-                        null
-                    } else {
-                        previousRemoteKeyIndex = index
-                        index
-                    }
+                    keyIndexDao.remoteKeysRepoId(it.id, "$name:repos")
                 }
             ),
             pagingSourceFactory = { userLocalDataSource.getRepositories(name) }
@@ -107,7 +100,6 @@ class DetailsRepositoryImpl @Inject constructor(
         id: Int,
         config: PagingConfig
     ): Flow<PagingData<OrganizationsEntity>> {
-        var previousRemoteKeyIndex: KeyIndex? = null
         return Pager(
             config = config,
             remoteMediator = PagedKeyRemoteMediator(
@@ -137,13 +129,7 @@ class DetailsRepositoryImpl @Inject constructor(
                     )
                 },
                 findKeyDelegate = {
-                    val index = keyIndexDao.remoteKeysRepoId(it.id, "$id$name:orgs")
-                    return@PagedKeyRemoteMediator if (previousRemoteKeyIndex == index) {
-                        null
-                    } else {
-                        previousRemoteKeyIndex = index
-                        index
-                    }
+                    keyIndexDao.remoteKeysRepoId(it.id, "$id$name:orgs")
                 }
             ),
             pagingSourceFactory = { userLocalDataSource.getOrganizations(name) }

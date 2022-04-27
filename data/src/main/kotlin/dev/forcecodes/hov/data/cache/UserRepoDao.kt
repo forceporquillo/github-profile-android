@@ -13,7 +13,7 @@ interface UserRepoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveAll(repos: List<RepositoryEntity>)
 
-    @Query("SELECT * FROM repositoryentity WHERE owner_login=:name ORDER BY stargazersCount ASC")
+    @Query("SELECT * FROM repositoryentity WHERE owner_login=:name ORDER BY stargazersCount DESC")
     fun getRepos(name: String): PagingSource<Int, RepositoryEntity>
 
     @Query("DELETE FROM RepositoryEntity WHERE owner_login=:name")

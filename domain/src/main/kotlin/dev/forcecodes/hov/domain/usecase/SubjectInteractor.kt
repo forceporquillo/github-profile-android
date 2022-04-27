@@ -16,24 +16,11 @@
 
 package dev.forcecodes.hov.domain.usecase
 
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-
-/**
- * Executes the paging logic and maps the underlying data object [R] to UiModel [S] as Flow<PagingData<R>>.
- */
-abstract class PagingInteractor<P : PagingInteractor.Params<T>, T : Any, S> : SubjectInteractor<P, PagingData<T>>() {
-    interface Params<T : Any> {
-        val pagingConfig: PagingConfig
-    }
-
-    protected abstract fun S.toUiModel(id: String? = null): T
-}
 
 abstract class SubjectInteractor<P : Any, T> {
 

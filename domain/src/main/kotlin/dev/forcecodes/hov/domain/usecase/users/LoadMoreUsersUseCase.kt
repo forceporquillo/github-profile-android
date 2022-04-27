@@ -8,6 +8,7 @@ import dev.forcecodes.hov.domain.source.UsersRepository
 import dev.forcecodes.hov.domain.usecase.UseCaseParams
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
 import javax.inject.Singleton
 
