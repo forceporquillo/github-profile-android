@@ -5,8 +5,10 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import dev.forcecodes.hov.core.model.UserUiModel
+import dev.forcecodes.hov.data.api.models.RepositoryEntity
 import dev.forcecodes.hov.data.cache.UserDao
 import dev.forcecodes.hov.data.cache.entity.UserEntity
+import dev.forcecodes.hov.domain.source.DetailsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

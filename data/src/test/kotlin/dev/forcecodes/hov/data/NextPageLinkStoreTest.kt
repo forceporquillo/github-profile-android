@@ -57,6 +57,18 @@ class NextPageLinkStoreTest {
         Assert.assertEquals(0, nextPageLinkStore.nextPage())
     }
 
+    @Test
+    fun `check equal and load max page index`() {
+        nextPageLinkStore.takeMaxAndStore(120)
+        nextPageLinkStore.isEqual(30)
+
+        Assert.assertEquals(false,  nextPageLinkStore.isEqual(30))
+        Assert.assertEquals(120, nextPageLinkStore.nextPage())
+
+        nextPageLinkStore.takeMaxAndStore(120)
+        Assert.assertEquals(120, nextPageLinkStore.nextPage())
+    }
+
     private class FakePrefs : LinkPreference {
 
         private var pageIndex: Int? = 0

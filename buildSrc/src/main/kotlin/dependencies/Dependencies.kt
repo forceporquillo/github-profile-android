@@ -68,6 +68,7 @@ object Dependencies {
 
     // Square
     const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
+    const val okhttp_urlconnection = "com.squareup.okhttp3:okhttp-urlconnection:${Versions.okhttp}"
     const val okhttp = "com.squareup.okhttp3:okhttp:${Versions.okhttp}"
     const val okhttp_tls = "com.squareup.okhttp3:okhttp-tls:${Versions.okhttp_tls}"
     const val moshi = "com.squareup.moshi:moshi-kotlin:${Versions.moshi}"

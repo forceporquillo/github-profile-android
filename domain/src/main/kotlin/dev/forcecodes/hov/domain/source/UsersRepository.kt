@@ -1,9 +1,7 @@
 package dev.forcecodes.hov.domain.source
 
 import dev.forcecodes.hov.core.Result
-import dev.forcecodes.hov.core.internal.Logger
 import dev.forcecodes.hov.data.api.GithubRemoteDataSource
-import dev.forcecodes.hov.data.api.conflateResource
 import dev.forcecodes.hov.data.cache.LocalUserDataSource
 import dev.forcecodes.hov.data.cache.entity.UserEntity
 import dev.forcecodes.hov.domain.mapper.UserEntityMapper
@@ -40,10 +38,7 @@ class UserRepositoryImpl @Inject constructor(
     ): Flow<Result<List<UserEntity>>> = conflateResource(
         cacheSource = { userLocalDataSource.getUserFlow() },
         remoteSource = { githubRemoteDataSource.getUsers(since, maxSize) },
-        saveFetchResult = { list ->
-            Logger.e("saving result $list")
-            userLocalDataSource.saveUsers(userEntityMapper.invoke(list))
-                          },
+        saveFetchResult = { list -> userLocalDataSource.saveUsers(userEntityMapper.invoke(list)) },
         shouldFetch = { cache ->
             // fetch only when db cache is empty or we
             // forcibly invoked to invalidate
