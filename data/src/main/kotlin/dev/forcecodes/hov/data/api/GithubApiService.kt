@@ -1,5 +1,7 @@
 package dev.forcecodes.hov.data.api
 
+import dev.forcecodes.hov.data.api.models.OrganizationsResponse
+import dev.forcecodes.hov.data.api.models.RepositoryEntity
 import dev.forcecodes.hov.data.api.models.UserDetailsResponse
 import dev.forcecodes.hov.data.api.models.UserResponse
 import retrofit2.Response
@@ -19,4 +21,18 @@ interface GithubApiService {
     suspend fun getDetails(
         @Path("name") name: String
     ): Response<UserDetailsResponse>
+
+    @GET("users/{name}/orgs")
+    suspend fun getUserOrganizations(
+        @Path("name") name: String,
+        @Query("page") page: Int,
+        @Query("per_page") size: Int
+    ): List<OrganizationsResponse>
+
+    @GET("users/{name}/repos")
+    suspend fun getUserRepositories(
+        @Path("name") name: String,
+        @Query("page") page: Int,
+        @Query("per_page") size: Int
+    ): List<RepositoryEntity>
 }
