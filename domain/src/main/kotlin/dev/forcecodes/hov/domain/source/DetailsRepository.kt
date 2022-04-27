@@ -12,7 +12,7 @@ import dev.forcecodes.hov.data.api.models.RepositoryEntity
 import dev.forcecodes.hov.data.cache.KeyIndexDao
 import dev.forcecodes.hov.data.cache.LocalUserDataSource
 import dev.forcecodes.hov.data.cache.entity.KeyIndex
-import dev.forcecodes.hov.data.cache.entity.OrganizationEntityMapper
+import dev.forcecodes.hov.domain.mapper.OrganizationEntityMapper
 import dev.forcecodes.hov.data.cache.entity.OrganizationsEntity
 import dev.forcecodes.hov.data.cache.entity.UserDetailsEntity
 import dev.forcecodes.hov.domain.mapper.UserDetailsEntityMapper
