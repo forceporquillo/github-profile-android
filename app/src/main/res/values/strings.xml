@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="github_users">Github Users</string>
+    <string name="description_github_user_blurred_banner">github user blurred banner</string>
+    <string name="followers_count"><b>%1$d</b> followers • <b>%2$d</b> following</string>
+    <string name="github_url">github.com/%1$s</string>
+    <string name="paging_error_message">Failed to retrieve data from the network.\nPlease check your internet connection and try again</string>
+    <string name="retry_button">Retry</string>
+    <string name="paging_end_scroll_message">That\'s a wrap! %1$s.\nTry again later.</string>
+    <string name="nav_title_xml">XML</string>
+    <string name="nav_title_compose">Compose</string>
 </resources>

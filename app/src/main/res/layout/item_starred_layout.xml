@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_normal">
+
+    <LinearLayout
+        android:layout_marginBottom="4dp"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <dev.forcecodes.hov.widget.CircleImageView
+            android:id="@+id/org_avatar"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars" />
+
+        <TextView
+            android:textColor="?attr/colorPrimary"
+            android:id="@+id/owner_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_medium"
+            tools:text="forceporquillo"
+            android:textSize="@dimen/text_size_regular"
+            app:layout_constraintStart_toEndOf="@id/org_avatar"
+            app:layout_constraintTop_toTopOf="@id/org_avatar" />
+
+    </LinearLayout>
+
+    <TextView
+        android:textColor="?attr/colorPrimary"
+        android:id="@+id/repo_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="preggo-android"
+        android:textSize="@dimen/text_size_regular" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/spacing_small" />
+
+    <TextView
+        android:id="@+id/repo_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="💊 Unofficial Covid-19 Web API for Philippines from data collected by DOH using Node.js that updates itself as soon as DOH released new Data." />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/spacing_normal" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/stargazer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_star"
+            android:drawablePadding="@dimen/spacing_small"
+            android:gravity="center_vertical"
+            app:drawableTint="@color/github_gold"
+            tools:text="1,000" />
+
+        <Space
+            android:layout_width="@dimen/spacing_normal"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/image_color_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="@dimen/spacing_small"
+            android:src="@drawable/ic_circle" />
+
+        <TextView
+            android:id="@+id/language"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="@dimen/spacing_small"
+            android:gravity="center_vertical"
+            tools:text="Kotlin" />
+
+    </LinearLayout>
+
+</LinearLayout>

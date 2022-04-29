@@ -19,5 +19,7 @@
 
     <dimen name="button_height_default">56dp</dimen>
     <dimen name="github_icon_size">28dp</dimen>
+    <dimen name="spacing_smaller">4dp</dimen>
+    <dimen name="header_banner_height">180dp</dimen>
 
 </resources>

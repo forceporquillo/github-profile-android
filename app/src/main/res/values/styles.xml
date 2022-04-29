@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MainToolbarTextAppearance" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textSize">@dimen/text_size_h2</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.App.TabLayout" parent="Widget.MaterialComponents.TabLayout">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.TabLayout</item>
+        <item name="tabTextAppearance">@style/TextAppearance.App.Button</item>
+    </style>
+
+    <style name="TextAppearance.App.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="fontFamily">@font/proxima_nova</item>
+        <item name="android:fontFamily">@font/proxima_nova</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/text_size_regular</item>
+    </style>
+
+    <style name="TextAppearance.AppCompat.Caption.Details" parent="TextAppearance.AppCompat.Large">
+        <item name="android:paddingBottom">@dimen/spacing_smaller</item>
+        <item name="android:textSize">@dimen/text_size_regular</item>
+        <item name="maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:drawablePadding">@dimen/spacing_small</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:paddingTop">@dimen/spacing_smaller</item>
+        <item name="android:paddingEnd">@dimen/spacing_small</item>
+        <item name="android:letterSpacing">0.002</item>
+    </style>
+
+    <style name="TextAppearance.AppCompat.Caption.Details.Bold" parent="TextAppearance.AppCompat.Caption.Details">
+       <item name="android:textStyle">bold</item>
+    </style>
+</resources>

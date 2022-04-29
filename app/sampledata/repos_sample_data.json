@@ -1,0 +1,82 @@
+[
+  {
+    "id": 3070104,
+    "node_id": "MDEwOlJlcG9zaXRvcnkzMDcwMTA0",
+    "name": "abs.io",
+    "full_name": "JakeWharton/abs.io",
+    "language": "JavaScript",
+    "default_branch": "master"
+  },
+  {
+    "id": 1451060,
+    "node_id": "MDEwOlJlcG9zaXRvcnkxNDUxMDYw",
+    "name": "ActionBarSherlock",
+    "full_name": "JakeWharton/ActionBarSherlock",
+    "language": "Java",
+    "default_branch": "master"
+  },
+  {
+    "id": 11718829,
+    "node_id": "MDEwOlJlcG9zaXRvcnkxMTcxODgyOQ==",
+    "name": "ActionBarSherlock-Gradle-Sample",
+    "full_name": "JakeWharton/ActionBarSherlock-Gradle-Sample",
+    "language": "Groovy",
+    "default_branch": "master"
+  },
+  {
+    "id": 3473126,
+    "node_id": "MDEwOlJlcG9zaXRvcnkzNDczMTI2",
+    "name": "ActionBarSherlock-Plugin-Maps",
+    "full_name": "JakeWharton/ActionBarSherlock-Plugin-Maps",
+    "language": "Java",
+    "default_branch": "master"
+  },
+  {
+    "id": 4930384,
+    "node_id": "MDEwOlJlcG9zaXRvcnk0OTMwMzg0",
+    "name": "ActivityCompat2",
+    "full_name": "JakeWharton/ActivityCompat2",
+    "language": "Java",
+    "default_branch": "master"
+  },
+  {
+    "id": 278755524,
+    "node_id": "MDEwOlJlcG9zaXRvcnkyNzg3NTU1MjQ=",
+    "name": "adb-event-mirror",
+    "full_name": "JakeWharton/adb-event-mirror",
+    "language": "Kotlin",
+    "default_branch": "trunk"
+  },
+  {
+    "id": 9198813,
+    "node_id": "MDEwOlJlcG9zaXRvcnk5MTk4ODEz",
+    "name": "adjacent-fragment-pager-sample",
+    "full_name": "JakeWharton/adjacent-fragment-pager-sample",
+    "language": "Java",
+    "default_branch": "master"
+  },
+  {
+    "id": 248560940,
+    "node_id": "MDEwOlJlcG9zaXRvcnkyNDg1NjA5NDA=",
+    "name": "agp-java-support",
+    "full_name": "JakeWharton/agp-java-support",
+    "language": "Java",
+    "default_branch": "master"
+  },
+  {
+    "id": 2264200,
+    "node_id": "MDEwOlJlcG9zaXRvcnkyMjY0MjAw",
+    "name": "Android-DirectionalViewPager",
+    "full_name": "JakeWharton/Android-DirectionalViewPager",
+    "language": "Java",
+    "default_branch": "master"
+  },
+  {
+    "id": 2135106,
+    "node_id": "MDEwOlJlcG9zaXRvcnkyMTM1MTA2",
+    "name": "Android-MapForgeFragment",
+    "full_name": "JakeWharton/Android-MapForgeFragment",
+    "language": "Java",
+    "default_branch": "master"
+  }
+]

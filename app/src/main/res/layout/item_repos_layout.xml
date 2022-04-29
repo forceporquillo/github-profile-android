@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_normal">
+
+    <TextView
+        android:id="@+id/repository_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="@dimen/text_size_regular"
+        android:textStyle="bold"
+        tools:text="Lorem Ipsum" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/spacing_small" />
+
+    <TextView
+        android:id="@+id/tag_state_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="3"
+        tools:text="Lorem Ipsum" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/spacing_normal" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/stargazer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_star"
+            android:drawablePadding="@dimen/spacing_small"
+            android:gravity="center_vertical"
+            app:drawableTint="@color/github_gold"
+            tools:text="1,000" />
+
+        <Space
+            android:layout_width="@dimen/spacing_normal"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/image_color_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="@dimen/spacing_small"
+            android:src="@drawable/ic_circle" />
+
+        <TextView
+            android:id="@+id/language"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="@dimen/spacing_small"
+            android:gravity="center_vertical"
+            tools:text="Kotlin" />
+
+    </LinearLayout>
+
+</LinearLayout>
