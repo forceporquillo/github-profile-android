@@ -1,6 +1,5 @@
 import dependencies.Dependencies
 import dependencies.TestDependencies
-import dependencies.Versions
 import extensions.applyRequiredInjectDeps
 
 plugins {
