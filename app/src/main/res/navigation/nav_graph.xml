@@ -3,13 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/githubUsersFragment">
+    app:startDestination="@id/xml">
 
     <fragment
         app:route="xml"
-        android:id="@+id/githubUsersFragment"
+        android:id="@+id/xml"
         android:name="dev.forcecodes.hov.ui.xml.GithubUsersFragment"
         android:label="GithubUsersFragment"
         tools:layout="@layout/fragment_github_users"/>
+
+    <fragment
+        app:route="xml"
+        android:id="@+id/compose"
+        android:name="dev.forcecodes.hov.ui.compose.GithubUsersComposeFragment"
+        android:label="GithubUsersComposeFragment" />
 
 </navigation>

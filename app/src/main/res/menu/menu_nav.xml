@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="XML"
+        android:title="@string/nav_title_xml"
         android:id="@+id/xml"
         android:icon="@drawable/ic_xml"/>
 
     <item
-        android:title="Compose"
+        android:title="@string/nav_title_compose"
         android:id="@+id/compose"
         android:icon="@drawable/ic_compose"/>
 

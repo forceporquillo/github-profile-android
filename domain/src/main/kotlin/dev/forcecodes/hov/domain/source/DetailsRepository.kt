@@ -1,23 +1,24 @@
 package dev.forcecodes.hov.domain.source
 
 import androidx.paging.ExperimentalPagingApi
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import dev.forcecodes.hov.core.Result
-import dev.forcecodes.hov.core.internal.Logger
 import dev.forcecodes.hov.data.api.GithubRemoteDataSource
 import dev.forcecodes.hov.data.api.models.Owner
 import dev.forcecodes.hov.data.api.models.RepositoryEntity
+import dev.forcecodes.hov.data.api.models.StarredReposEntity
 import dev.forcecodes.hov.data.cache.KeyIndexDao
 import dev.forcecodes.hov.data.cache.LocalUserDataSource
-import dev.forcecodes.hov.data.cache.entity.KeyIndex
-import dev.forcecodes.hov.data.cache.entity.OrganizationEntityMapper
 import dev.forcecodes.hov.data.cache.entity.OrganizationsEntity
 import dev.forcecodes.hov.data.cache.entity.UserDetailsEntity
+import dev.forcecodes.hov.domain.di.DETAILS_REPOS
+import dev.forcecodes.hov.domain.di.STARRED_REPOS
+import dev.forcecodes.hov.domain.di.USER_ORGS
+import dev.forcecodes.hov.domain.mapper.OrganizationEntityMapper
+import dev.forcecodes.hov.domain.mapper.StarredReposEntityEntityMapper
 import dev.forcecodes.hov.domain.mapper.UserDetailsEntityMapper
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Named
 
 data class BasicInfo(
     val id: Int,
@@ -25,22 +26,31 @@ data class BasicInfo(
 )
 
 interface DetailsRepository {
-    fun getUserDetails(details: BasicInfo): Flow<Result<UserDetailsEntity>>
-    fun getUserRepositories(name: String, config: PagingConfig): Flow<PagingData<RepositoryEntity>>
-    fun getUserOrganizations(
-        name: String,
-        id: Int,
-        config: PagingConfig
-    ): Flow<PagingData<OrganizationsEntity>>
+    fun getUserDetails(
+        details: BasicInfo
+    ): Flow<Result<UserDetailsEntity>>
+
+    fun getRepositories(name: String): Flow<Result<List<RepositoryEntity>>>
+    fun getStarredRepositories(name: String): Flow<Result<List<StarredReposEntity>>>
+    fun getOrganizations(name: String): Flow<Result<List<OrganizationsEntity>>>
 }
 
+@OptIn(ExperimentalPagingApi::class)
 class DetailsRepositoryImpl @Inject constructor(
     private val organizationEntityMapper: OrganizationEntityMapper,
+    private val starredReposEntityEntityMapper: StarredReposEntityEntityMapper,
     private val keyIndexDao: KeyIndexDao,
     private val userLocalDataSource: LocalUserDataSource,
     private val githubRemoteDataSource: GithubRemoteDataSource,
     private val entityMapper: UserDetailsEntityMapper,
-) : DetailsRepository {
+
+    @Named(DETAILS_REPOS)
+    private val reposPaginator: UserDetailsKeyIndexPaginator,
+    @Named(STARRED_REPOS)
+    private val starredReposPaginator: UserDetailsKeyIndexPaginator,
+    @Named(USER_ORGS)
+    private val orgsPaginator: UserDetailsKeyIndexPaginator,
+) : NetworkBoundResource(), DetailsRepository {
 
     override fun getUserDetails(details: BasicInfo): Flow<Result<UserDetailsEntity>> {
         return conflateResource(
@@ -57,97 +67,56 @@ class DetailsRepositoryImpl @Inject constructor(
         )
     }
 
-    @OptIn(ExperimentalPagingApi::class)
-    override fun getUserRepositories(
-        name: String,
-        config: PagingConfig
-    ): Flow<PagingData<RepositoryEntity>> {
-        var previousRemoteKeyIndex: KeyIndex? = null
-        return Pager(
-            config = config,
-            remoteMediator = PagedKeyRemoteMediator(
-                onSuccess = { page, size ->
-                    githubRemoteDataSource.getRepositories(name, page, size)
-                },
-                refreshKeys = { items, nextKey, prevKey, refresh ->
-                    Logger.d("getUserRepositories.keys")
-                    val keys = items.map {
-                        KeyIndex(
-                            it.id,
-                            prevSince = prevKey,
-                            nextSince = nextKey,
-                            tag = "$name:repos"
-                        )
-                    }
-                    userLocalDataSource.insertAllReposWithKeys(
-                        keys,
-                        items,
-                        refresh,
-                        name,
-                        ":repos"
-                    )
-                },
-                findKeyDelegate = {
-                    val index = keyIndexDao.remoteKeysRepoId(it.id, "$name:repos")
-                    return@PagedKeyRemoteMediator if (previousRemoteKeyIndex == index) {
-                        null
-                    } else {
-                        previousRemoteKeyIndex = index
-                        index
-                    }
-                }
-            ),
-            pagingSourceFactory = { userLocalDataSource.getRepositories(name) }
-        ).flow
+    override fun getRepositories(name: String): Flow<Result<List<RepositoryEntity>>> {
+        return reposPaginator.requestData(
+            name,
+            cacheSource = {
+                userLocalDataSource.getUserRepositoriesFlow(name)
+            },
+            remoteSource = { page ->
+                githubRemoteDataSource.getRepositories1(name, page, 100)
+            },
+            saveFetchResult = {
+                userLocalDataSource.saveUserRepositories(it)
+            }
+        )
     }
 
-    @OptIn(ExperimentalPagingApi::class)
-    override fun getUserOrganizations(
-        name: String,
-        id: Int,
-        config: PagingConfig
-    ): Flow<PagingData<OrganizationsEntity>> {
-        var previousRemoteKeyIndex: KeyIndex? = null
-        return Pager(
-            config = config,
-            remoteMediator = PagedKeyRemoteMediator(
-                onSuccess = { page, size ->
-                    githubRemoteDataSource.getOrganizations(name, page, size)
-                },
-                refreshKeys = { items, nextKey, prevKey, clear ->
-
-                    Logger.d("getUserOrganizations.keys")
-                    val keys = items.map {
-                        KeyIndex(
-                            it.id,
-                            prevSince = prevKey,
-                            nextSince = nextKey,
-                            tag = "$id$name:orgs"
-                        )
-                    }
-                    val dataEntity = items.map { org ->
-                        organizationEntityMapper.invoke(org, Owner(name, id.toString()))
-                    }
-                    userLocalDataSource.insertAllOrgsWithKeys(
-                        keys,
-                        dataEntity,
-                        clear,
-                        name,
-                        "$id$name:orgs"
-                    )
-                },
-                findKeyDelegate = {
-                    val index = keyIndexDao.remoteKeysRepoId(it.id, "$id$name:orgs")
-                    return@PagedKeyRemoteMediator if (previousRemoteKeyIndex == index) {
-                        null
-                    } else {
-                        previousRemoteKeyIndex = index
-                        index
-                    }
+    override fun getStarredRepositories(name: String): Flow<Result<List<StarredReposEntity>>> {
+        return orgsPaginator.requestData(
+            name,
+            cacheSource = {
+                userLocalDataSource.getStarredRepositoresFlow(name)
+            },
+            remoteSource = {
+                githubRemoteDataSource.getStarredRepositories1(name, it, 100)
+            },
+            saveFetchResult = {
+                val entity = it.map { starred ->
+                    starredReposEntityEntityMapper.invoke(starred, name)
                 }
-            ),
-            pagingSourceFactory = { userLocalDataSource.getOrganizations(name) }
-        ).flow
+                userLocalDataSource.saveStarredRepositores(entity)
+            }
+        )
+    }
+
+    override fun getOrganizations(name: String): Flow<Result<List<OrganizationsEntity>>> {
+        return orgsPaginator.requestData(
+            name,
+            cacheSource = {
+                userLocalDataSource.getOrganizationsFlow(name)
+            },
+            remoteSource = { page ->
+                githubRemoteDataSource.getOrganizations(name, page, 100)
+            },
+            saveFetchResult = {
+                val entity = it.map { org ->
+                    organizationEntityMapper.invoke(org, Owner(name, "23"))
+                }
+
+                userLocalDataSource.saveOrganizations(entity)
+            }
+        )
     }
 }
 

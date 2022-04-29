@@ -38,31 +38,3 @@ data class OrganizationsEntity(
     @Embedded
     val owner: Owner? = null
 )
-
-class OrganizationEntityMapper @Inject constructor() :
-    EntityMapper<OrganizationsResponse, Owner, OrganizationsEntity> {
-
-    override fun invoke(data: OrganizationsResponse, map: Owner): OrganizationsEntity {
-        return data.run {
-            OrganizationsEntity(
-                id = id,
-                issuesUrl = issuesUrl,
-                reposUrl = reposUrl,
-                avatarUrl = avatarUrl,
-                eventsUrl = eventsUrl,
-                membersUrl = membersUrl,
-                description = description,
-                hooksUrl = hooksUrl,
-                login = login,
-                url = url,
-                nodeId = nodeId,
-                publicMembersUrl = publicMembersUrl,
-                owner = map
-            )
-        }
-    }
-}
-
-interface EntityMapper<in T, in D, R> {
-    operator fun invoke(data: T, map: D): R
-}

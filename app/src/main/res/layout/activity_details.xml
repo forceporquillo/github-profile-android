@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewmodel"
+            type="dev.forcecodes.hov.ui.details.DetailsViewModel" />
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:elevation="0dp"
+            app:elevation="0dp">
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/coordinator_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="0dp"
+                app:collapsedTitleTextColor="?attr/colorPrimary"
+                app:contentScrim="?attr/colorSecondaryVariant"
+                app:expandedTitleTextColor="@android:color/transparent"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:scrimAnimationDuration="200"
+                app:title="@{viewmodel.state.data.name}"
+                app:titleCollapseMode="fade">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraint_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_small">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guideline_start"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_begin="@dimen/spacing_normal" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guideline_end"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_end="@dimen/spacing_normal" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guideline_intrinsic_banner"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:orientation="horizontal"
+                        app:layout_constraintGuide_percent="0.17" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guideline_profile_frame"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layout_constraintGuide_percent="0.245" />
+
+                    <ImageView
+                        android:id="@+id/header_banner"
+                        blurImage="@{viewmodel.state.data.id}"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/header_banner_height"
+                        android:contentDescription="@string/description_github_user_blurred_banner"
+                        android:scaleType="centerCrop"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:src="@tools:sample/cities" />
+
+                    <dev.forcecodes.hov.widget.CircleImageView
+                        android:id="@+id/user_profile"
+                        loadImage="@{viewmodel.state.data.id}"
+                        android:layout_width="@dimen/user_profile_size"
+                        android:layout_height="@dimen/user_profile_size"
+                        android:layout_marginTop="@dimen/spacing_normal"
+                        app:layout_constraintBottom_toBottomOf="@id/display_name"
+                        app:layout_constraintStart_toStartOf="@id/guideline_start"
+                        app:layout_constraintTop_toBottomOf="@id/header_banner"
+                        tools:src="@tools:sample/avatars[24]" />
+
+                    <Space
+                        android:id="@+id/spacer"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/spacing_normal"
+                        app:layout_constraintTop_toBottomOf="@id/user_profile" />
+
+                    <TextView
+                        android:id="@+id/display_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_normal"
+                        android:layout_marginTop="@dimen/spacing_smaller"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="@{viewmodel.state.data.displayName.length() == 0 ? viewmodel.state.data.name : viewmodel.state.data.displayName}"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="@dimen/text_size_h4"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toTopOf="@id/user_name"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/user_profile"
+                        app:layout_constraintTop_toBottomOf="@id/header_banner"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        tools:text="JakeWharton" />
+
+                    <TextView
+                        android:id="@+id/user_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_normal"
+                        android:text="@{viewmodel.state.data.name}"
+                        android:textSize="@dimen/text_size_regular"
+                        app:layout_constraintBottom_toBottomOf="@id/user_profile"
+                        app:layout_constraintStart_toEndOf="@id/user_profile"
+                        app:layout_constraintTop_toBottomOf="@id/display_name"
+                        tools:text="JakeWharton" />
+
+                    <TextView
+                        android:id="@+id/user_bio"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/spacing_small"
+                        android:maxLines="1"
+                        android:paddingBottom="@dimen/spacing_small"
+                        android:text="@{viewmodel.state.data.bio}"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="@dimen/text_size_regular"
+                        android:visibility="@{viewmodel.state.data.bio.length() == 0 ? View.GONE : View.VISIBLE}"
+                        app:layout_constraintEnd_toEndOf="@id/guideline_end"
+                        app:layout_constraintStart_toStartOf="@id/guideline_start"
+                        app:layout_constraintTop_toBottomOf="@id/spacer"
+                        tools:text="I believe code is just as much a design tool as Figma." />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/company"
+                        style="@style/TextAppearance.AppCompat.Caption.Details.Bold"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/spacing_normal"
+                        android:drawableStart="@drawable/ic_company"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:maxLines="1"
+                        android:text="@{viewmodel.state.data.company}"
+                        android:visibility="@{viewmodel.state.data.company.length() == 0 ? View.GONE : View.VISIBLE}"
+                        app:layout_constraintEnd_toEndOf="@id/guideline_end"
+                        app:layout_constraintStart_toStartOf="@id/guideline_start"
+                        app:layout_constraintTop_toBottomOf="@id/user_bio"
+                        tools:text="FEU Institute of Technology" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/location"
+                        style="@style/TextAppearance.AppCompat.Caption.Details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/ic_pin"
+                        android:drawablePadding="@dimen/spacing_small"
+                        android:gravity="center_vertical"
+                        android:maxLines="1"
+                        android:paddingTop="@dimen/spacing_smaller"
+                        android:paddingBottom="@dimen/spacing_smaller"
+                        android:text="@{viewmodel.state.data.location}"
+                        android:textSize="@dimen/text_size_regular"
+                        android:visibility="@{viewmodel.state.data.location.length() == 0 ? View.GONE : View.VISIBLE}"
+                        app:layout_constraintStart_toStartOf="@id/guideline_start"
+                        app:layout_constraintTop_toBottomOf="@id/company"
+                        tools:text="Manila, Philippines" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/twitter"
+                        style="@style/TextAppearance.AppCompat.Caption.Details.Bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/ic_twitter"
+                        android:gravity="center_vertical"
+                        android:text="@{viewmodel.state.data.twitter}"
+                        android:visibility="@{viewmodel.state.data.twitter.length() == 0 ? View.GONE : View.VISIBLE}"
+                        app:layout_constraintStart_toStartOf="@id/guideline_start"
+                        app:layout_constraintTop_toBottomOf="@id/location"
+                        tools:text="/@twitter_handle" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/github_link"
+                        style="@style/TextAppearance.AppCompat.Caption.Details.Bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/ic_link"
+                        android:gravity="center_vertical"
+                        android:text="@{String.format(@string/github_url, viewmodel.state.data.name)}"
+                        android:visibility="@{viewmodel.state.data.name.length() == 0 ? View.GONE : View.VISIBLE}"
+                        app:layout_constraintStart_toStartOf="@id/guideline_start"
+                        app:layout_constraintTop_toBottomOf="@id/twitter"
+                        tools:text="https://forceporquillo.githbub.io" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/email"
+                        style="@style/TextAppearance.AppCompat.Caption.Details.Bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/ic_mail"
+                        android:text="@{viewmodel.state.data.email}"
+                        android:visibility="@{viewmodel.state.data.email.length() == 0 ? View.GONE : View.VISIBLE}"
+                        app:layout_constraintStart_toStartOf="@id/guideline_start"
+                        app:layout_constraintTop_toBottomOf="@id/github_link"
+                        tools:text="fporquillo18@gmail.com" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/followers"
+                        style="@style/TextAppearance.AppCompat.Caption.Details"
+                        followers="@{viewmodel.state.data.followersString}"
+                        following="@{viewmodel.state.data.followingString}"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/ic_user"
+                        android:drawablePadding="@dimen/spacing_small"
+                        app:layout_constraintStart_toStartOf="@id/guideline_start"
+                        app:layout_constraintTop_toBottomOf="@id/email"
+                        tools:text="@string/followers_count" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@android:color/transparent"
+                    app:contentInsetStart="0dp"
+                    app:contentInsetStartWithNavigation="0dp"
+                    app:layout_collapseMode="pin"
+                    app:navigationIcon="@drawable/ic_back_arrow">
+
+                </com.google.android.material.appbar.MaterialToolbar>
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tablayout"
+                style="@style/Widget.App.TabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:tabGravity="fill"
+                app:tabIndicatorColor="?attr/colorOnSecondary"
+                app:tabIndicatorFullWidth="false"
+                app:tabMode="fixed" />
+
+            <View
+                android:id="@+id/tablayout_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:alpha="0.4"
+                android:background="@android:color/darker_gray" />
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/nested_scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <dev.forcecodes.hov.ui.details.DetailsWrapContentViewPager
+                    android:id="@+id/view_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </androidx.core.widget.NestedScrollView>
+
+        </LinearLayout>
+
+        <FrameLayout
+            delayedVisibility="@{viewmodel.state.loading}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/colorSecondaryVariant"
+            tools:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+
+        </FrameLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

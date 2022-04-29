@@ -84,6 +84,7 @@ object NetworkModule {
 
             addInterceptor(Interceptor { chain ->
                 val request = chain.request().newBuilder()
+                    .addHeader("Authorization", "token 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")
                     .addHeader("Accept", "application/vnd.github.v3+json")
                     .build()
 

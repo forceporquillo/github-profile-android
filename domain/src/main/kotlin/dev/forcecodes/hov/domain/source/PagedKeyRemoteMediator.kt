@@ -9,6 +9,7 @@ import dev.forcecodes.hov.data.cache.entity.KeyIndex
 
 private const val STARTING_PAGE_INDEX = 1
 
+@Deprecated("unused")
 @OptIn(ExperimentalPagingApi::class)
 class PagedKeyRemoteMediator<Cache : Any, Remote : Any>(
     private val onSuccess: suspend (page: Int, size: Int) -> List<Remote>,
@@ -16,7 +17,7 @@ class PagedKeyRemoteMediator<Cache : Any, Remote : Any>(
     private val findKeyDelegate: suspend (Cache) -> KeyIndex?,
 ) : RemoteMediator<Int, Cache>() {
 
-    private var prevKey: Int? = null
+    private var previousKey: Int? = null
 
     override suspend fun initialize(): InitializeAction {
         return InitializeAction.LAUNCH_INITIAL_REFRESH
@@ -26,47 +27,31 @@ class PagedKeyRemoteMediator<Cache : Any, Remote : Any>(
         val page = when (loadType) {
             LoadType.REFRESH -> {
                 val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
-                Logger.e(">>>>>    REFRESH: ${remoteKeys?.nextSince?.minus(1) ?: STARTING_PAGE_INDEX}")
                 remoteKeys?.nextSince?.minus(1) ?: STARTING_PAGE_INDEX
             }
 
             LoadType.PREPEND -> {
                 val remoteKeys = getRemoteKeyForFirstItem(state)
                 val prevKey = remoteKeys?.prevSince
-                    ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
-                Logger.e(
-                    ">>>>>    prevKey: ${
-                        remoteKeys.prevSince ?: return MediatorResult.Success(
-                            endOfPaginationReached = true
-                        )
-                    }"
-                )
+                    ?: return MediatorResult.Success(remoteKeys != null)
                 prevKey
             }
 
             LoadType.APPEND -> {
                 val remoteKeys = getRemoteKeyForLastItem(state)
                 var nextKey = remoteKeys?.nextSince
-                    ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
-                Logger.e(
-                    ">>>>>    nextKey: ${
-                        remoteKeys.nextSince ?: return MediatorResult.Success(
-                            endOfPaginationReached = true
-                        )
-                    }"
-                )
+                    ?: return MediatorResult.Success(remoteKeys != null)
 
-                if (prevKey == nextKey) {
-                    nextKey += 1
+                if (previousKey == null) {
+                    previousKey = nextKey
                 } else {
-                    prevKey = nextKey
+                    nextKey = previousKey!!
+                    previousKey = nextKey + 1
                 }
 
                 nextKey
             }
         }
-
-        Logger.d(">>>>>    $loadType: Page: $page")
 
         return try {
             val result = onSuccess.invoke(page, state.config.pageSize)

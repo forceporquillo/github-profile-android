@@ -14,36 +14,42 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
-inline fun <Cache, Remote> conflateResource(
-    crossinline cacheSource: () -> Flow<Cache>,
-    crossinline remoteSource: suspend () -> ApiResponse<Remote>,
-    crossinline saveFetchResult: suspend (Remote) -> Unit,
-    crossinline shouldFetch: (Cache) -> Boolean = { true }
-): Flow<Result<Cache>> = flow {
-    emit(Result.Loading())
-    val cache = cacheSource().first()
+abstract class NetworkBoundResource {
 
-    val conflated = if (shouldFetch(cache)) {
-        emit(Result.Loading(cache))
-        try {
-            val request = remoteSource()
-            request.onSuccess {
-                saveFetchResult(this)
-            }.onError { errorMessage, exception ->
-                Logger.e(exception, errorMessage)
-                throw ApiErrorResponse(errorMessage)
-            }.onEmpty { emptyMessage ->
-                Logger.e(emptyMessage)
-                throw EmptyResponseException(emptyMessage)
-            }
-            cacheSource().map { Result.Success(it) }
-        } catch (e: Exception) {
-            Logger.e(e)
-            cacheSource().map { Result.Error(e, it) }
+    protected inline fun <Cache, Remote> conflateResource(
+        requireLoad: Boolean = true,
+        crossinline cacheSource: () -> Flow<Cache>,
+        crossinline remoteSource: suspend () -> ApiResponse<Remote>,
+        crossinline saveFetchResult: suspend (Remote) -> Unit,
+        crossinline shouldFetch: (Cache) -> Boolean = { true }
+    ): Flow<Result<Cache>> = flow {
+        if (requireLoad) {
+            emit(Result.Loading())
         }
-    } else {
-        cacheSource().map { Result.Success(it) }
-    }
+        val cache = cacheSource().first()
 
-    emitAll(conflated)
+        val conflated = if (shouldFetch(cache)) {
+            emit(Result.Loading(cache))
+            try {
+                val request = remoteSource()
+                request.onSuccess {
+                    saveFetchResult(this)
+                }.onError { errorMessage, exception ->
+                    Logger.e(exception, errorMessage)
+                    throw ApiErrorResponse(errorMessage)
+                }.onEmpty { emptyMessage ->
+                    Logger.e(emptyMessage)
+                    throw EmptyResponseException(emptyMessage)
+                }
+                cacheSource().map { Result.Success(it) }
+            } catch (e: Exception) {
+                Logger.e(e)
+                cacheSource().map { Result.Error(e, it) }
+            }
+        } else {
+            cacheSource().map { Result.Success(it) }
+        }
+
+        emitAll(conflated)
+    }
 }

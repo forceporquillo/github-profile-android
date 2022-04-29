@@ -4,6 +4,7 @@ import dev.forcecodes.hov.data.api.models.OrganizationsResponse
 import dev.forcecodes.hov.data.api.models.RepositoryEntity
 import dev.forcecodes.hov.data.api.models.UserDetailsResponse
 import dev.forcecodes.hov.data.api.models.UserResponse
+import dev.forcecodes.hov.data.api.models.StarredResponse
 import dev.forcecodes.hov.data.internal.GithubApi
 import javax.inject.Inject
 
@@ -34,15 +35,29 @@ class GithubRemoteDataSource @Inject constructor(
         name: String,
         page: Int,
         size: Int
-    ): List<OrganizationsResponse> {
-        return githubApiService.getUserOrganizations(name, page, size)
+    ): ApiResponse<List<OrganizationsResponse>> {
+        return getResponse {
+            githubApiService.getUserOrganizations(name, page, size)
+        }
     }
 
-    suspend fun getRepositories(
+    suspend fun getRepositories1(
         name: String,
         page: Int,
         size: Int
-    ): List<RepositoryEntity> {
-        return githubApiService.getUserRepositories(name, page, size)
+    ): ApiResponse<List<RepositoryEntity>> {
+        return getResponse {
+            githubApiService.getUserRepositories(name, page, size)
+        }
+    }
+
+    suspend fun getStarredRepositories1(
+        name: String,
+        page: Int,
+        size: Int
+    ): ApiResponse<List<StarredResponse>> {
+        return getResponse {
+            githubApiService.getUserStarredRepos(name, page, size)
+        }
     }
 }

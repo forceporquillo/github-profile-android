@@ -50,9 +50,12 @@ data class RepositoryEntity(
 
 @JsonClass(generateAdapter = true)
 data class Owner(
+
     @ColumnInfo(name="owner_login")
+    @Json(name="login")
     val login: String?,
 
+    @Json(name="id")
     @ColumnInfo(name="owner_id")
     val id: String?
 )

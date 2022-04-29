@@ -19,7 +19,7 @@ class UserRepositoryImpl @Inject constructor(
     private val userLocalDataSource: LocalUserDataSource,
     private val githubRemoteDataSource: GithubRemoteDataSource,
     private val userEntityMapper: UserEntityMapper
-) : UsersRepository {
+) : NetworkBoundResource(), UsersRepository {
 
     override fun refreshUser(page: Int): Flow<Result<List<UserEntity>>> {
         // always refresh from start and

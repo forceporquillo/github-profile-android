@@ -7,6 +7,7 @@ plugins {
     id(Plugins.android)
     kotlin(Plugins.android_kotlin)
     kotlin(Plugins.kapt)
+    kotlin("plugin.serialization")
     id(Plugins.dagger_hilt)
 }
 
@@ -125,6 +126,10 @@ dependencies {
     debugImplementation(TestDependencies.compose_tooling_test)
 
     applyRequiredInjectDeps()
+
+    implementation("com.charleskorn.kaml:kaml:0.43.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.1")
 }
 
 fun getSemanticAppVersionName(): String {

@@ -31,8 +31,8 @@ import java.security.MessageDigest
 class BlurTransformation : BitmapTransform() {
 
     companion object {
-        private const val RADIUS = 75
-        private const val DOWN_SAMPLING = 2
+        private const val RADIUS = 25
+        private const val DOWN_SAMPLING = 10
     }
 
     override fun transform(

@@ -1,70 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root_fragment_container_view"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+<layout>
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_start"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="@dimen/spacing_normal" />
+    <data>
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_end"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/spacing_normal" />
+        <import type="android.view.View" />
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+        <variable
+            name="viewmodel"
+            type="dev.forcecodes.hov.ui.MainActivityViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:contentInsetStart="@dimen/button_height_default"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="@string/github_users"
-        app:titleTextAppearance="@style/MainToolbarTextAppearance"
-        app:titleTextColor="@color/white" />
+        android:layout_height="match_parent"
+        tools:context=".ui.MainActivity">
 
-    <ImageView
-        android:layout_width="@dimen/github_icon_size"
-        android:layout_height="@dimen/github_icon_size"
-        android:contentDescription="@null"
-        android:src="@drawable/github_mark_light_64px"
-        app:layout_constraintBottom_toBottomOf="@id/toolbar"
-        app:layout_constraintStart_toStartOf="@id/guideline_start"
-        app:layout_constraintTop_toTopOf="@id/toolbar" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_start"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/spacing_normal" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/nav_controller_view"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:menu="@menu/menu_nav"
-        app:navGraph="@navigation/nav_graph" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_end"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/spacing_normal" />
 
-    <com.github.angads25.toggle.widget.DayNightSwitch
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
-        app:layout_constraintEnd_toEndOf="@id/guideline_end"
-        app:layout_constraintTop_toTopOf="parent" />
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:contentInsetStart="@dimen/button_height_default"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="@string/github_users"
+            app:titleTextAppearance="@style/MainToolbarTextAppearance" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_nav"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        app:itemIconTint="@color/bottom_nav_color"
-        app:itemTextColor="@color/bottom_nav_color"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/menu_nav" />
+        <ImageView
+            android:layout_width="@dimen/github_icon_size"
+            android:layout_height="@dimen/github_icon_size"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_github"
+            app:layout_constraintBottom_toBottomOf="@id/toolbar"
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toTopOf="@id/toolbar" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_controller_view"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:defaultNavHost="true"
+            app:layout_constraintBottom_toTopOf="@id/bottom_nav"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:menu="@menu/menu_nav"
+            app:navGraph="@navigation/nav_graph" />
+
+        <com.github.angads25.toggle.widget.DayNightSwitch
+            android:id="@+id/toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+            app:layout_constraintEnd_toEndOf="@id/guideline_end"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <FrameLayout
+            android:id="@+id/progress_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?attr/colorSecondaryVariant"
+            android:visibility="@{(!viewmodel.state.hasItems &amp;&amp; viewmodel.state.loading) || viewmodel.state.error != null ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="@id/nav_controller_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/nav_controller_view"
+            tools:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="@{viewmodel.state.error != null ? View.GONE : View.VISIBLE}" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/retry_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@{viewmodel.state.error}"
+            android:textColor="?attr/colorPrimary"
+            android:visibility="@{!viewmodel.state.hasItems &amp;&amp; viewmodel.state.error != null ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guideline_end"
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/paging_error_message"
+            tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_normal"
+            android:letterSpacing="0.0023"
+            android:onClick="@{() -> viewmodel.onRetry() }"
+            android:text="@string/retry_button"
+            android:visibility="@{!viewmodel.state.hasItems &amp;&amp; viewmodel.state.error != null ? View.VISIBLE : View.GONE}"
+            app:backgroundTint="?attr/colorSurface"
+            app:layout_constraintEnd_toEndOf="@id/guideline_end"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/retry_message"
+            tools:visibility="visible" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_nav"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?attr/colorSurface"
+            app:itemIconTint="@color/bottom_nav_color"
+            app:itemTextColor="@color/bottom_nav_color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:menu="@menu/menu_nav" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
