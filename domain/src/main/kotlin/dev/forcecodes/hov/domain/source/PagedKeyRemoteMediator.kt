@@ -9,6 +9,7 @@ import dev.forcecodes.hov.data.cache.entity.KeyIndex
 
 private const val STARTING_PAGE_INDEX = 1
 
+@Deprecated("unused")
 @OptIn(ExperimentalPagingApi::class)
 class PagedKeyRemoteMediator<Cache : Any, Remote : Any>(
     private val onSuccess: suspend (page: Int, size: Int) -> List<Remote>,

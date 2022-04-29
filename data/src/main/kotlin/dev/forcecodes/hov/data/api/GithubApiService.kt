@@ -4,6 +4,7 @@ import dev.forcecodes.hov.data.api.models.OrganizationsResponse
 import dev.forcecodes.hov.data.api.models.RepositoryEntity
 import dev.forcecodes.hov.data.api.models.UserDetailsResponse
 import dev.forcecodes.hov.data.api.models.UserResponse
+import dev.forcecodes.hov.data.api.models.StarredResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -27,12 +28,19 @@ interface GithubApiService {
         @Path("name") name: String,
         @Query("page") page: Int,
         @Query("per_page") size: Int
-    ): List<OrganizationsResponse>
+    ): Response<List<OrganizationsResponse>>
 
     @GET("users/{name}/repos")
     suspend fun getUserRepositories(
         @Path("name") name: String,
         @Query("page") page: Int,
         @Query("per_page") size: Int
-    ): List<RepositoryEntity>
+    ): Response<List<RepositoryEntity>>
+
+    @GET("users/{name}/starred")
+    suspend fun getUserStarredRepos(
+        @Path("name") name: String,
+        @Query("page") page: Int,
+        @Query("per_page") size: Int
+    ): Response<List<StarredResponse>>
 }
