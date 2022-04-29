@@ -14,6 +14,8 @@ fun DependencyHandler.applyRequiredInjectDeps() {
     implementation(Dependencies.okhttp)
     implementation(Dependencies.okhttp_logging)
     implementation(Dependencies.moshi)
+
+    implementation(Dependencies.datastore_prefs)
 }
 
 fun DependencyHandler.implementation(dependencyNotation: Any): Dependency? =
