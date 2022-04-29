@@ -12,6 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import dev.forcecodes.hov.binding.viewBinding
 import dev.forcecodes.hov.databinding.ActivityDetailsBinding
+import dev.forcecodes.hov.extensions.updateForTheme
+import dev.forcecodes.hov.theme.ThemeViewModel
 import kotlinx.coroutines.launch
 
 /**
@@ -23,12 +25,14 @@ class DetailsActivity : AppCompatActivity() {
     private val binding by viewBinding(ActivityDetailsBinding::inflate)
     private val viewModel by viewModels<DetailsViewModel>()
     private val subViewModel by viewModels<DetailsSubViewModel>()
+    private val themeViewModel: ThemeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
-
+        updateForTheme(themeViewModel.currentTheme)
+        
         binding.lifecycleOwner = this
         binding.viewmodel = viewModel
 
