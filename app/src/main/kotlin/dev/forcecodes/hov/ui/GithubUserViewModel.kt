@@ -12,13 +12,11 @@ import dev.forcecodes.hov.domain.usecase.users.ListItemUiState
 import dev.forcecodes.hov.domain.usecase.users.LoadMoreUsersUseCase
 import dev.forcecodes.hov.domain.usecase.users.ObserveGithubUsersInteractor
 import dev.forcecodes.hov.util.notNull
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

@@ -6,12 +6,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okio.IOException
-import retrofit2.Call
-import retrofit2.CallAdapter
 import retrofit2.HttpException
 import retrofit2.Response
-import retrofit2.Retrofit
-import java.lang.reflect.Type
 import java.net.ConnectException
 import java.net.SocketException
 import java.net.SocketTimeoutException
@@ -88,5 +84,5 @@ private fun <T> Exception.handleException(): ApiResponse.Error<T> {
     }
 }
 
-class EmptyResponseException(override val message: String? = "Empty response."): Exception(message)
+class EmptyResponseException(override val message: String? = "Empty response.") : Exception(message)
 class ApiErrorResponse(override val message: String?) : Exception(message)
