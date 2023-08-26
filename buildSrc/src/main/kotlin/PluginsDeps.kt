@@ -8,9 +8,9 @@ object PluginsDeps {
     const val dagger_hilt_compiler = "com.google.dagger:hilt-android-gradle-plugin:${Version.dagger_gradle_plugin}"
 
     object Version {
-        const val kotlin_deps = "1.6.10"
-        const val build_gradle_deps = "7.0.4"
+        const val kotlin_deps = "1.7.21"
+        const val build_gradle_deps = "7.2.2"
         const val nav_safe_args = "2.4.2"
-        const val dagger_gradle_plugin = "2.38.1"
+        const val dagger_gradle_plugin = "2.42"
     }
 }

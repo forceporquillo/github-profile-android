@@ -6,8 +6,8 @@ object Versions {
     const val core_ktx = "1.7.0"
     const val navigation = "2.4.0"
     const val navigation_hilt = "1.0.0"
-    const val app_compat = "1.4.0"
-    const val material = "1.5.0"
+    const val app_compat = "1.6.0"
+    const val material = "1.9.0"
     const val lifecycle = "2.4.0"
     const val fragment_ktx = "1.3.5"
     const val swipefresh = "1.1.0"
@@ -34,7 +34,7 @@ object Versions {
     const val dagger = "2.37"
 
     // Hilt
-    const val hilt = "2.38.1"
+    const val hilt = "2.42"
 
     const val rxjava3_kotlin = "3.0.1"
 
@@ -58,7 +58,7 @@ object Versions {
     const val leak_canary = "2.7"
 
     // Compose
-    const val compose = "1.1.1"
+    const val compose = "1.4.0-alpha02"
     const val compose_activity = "1.3.1"
     const val compose_navigation = "2.4.2"
 

@@ -22,6 +22,7 @@ buildscript {
         classpath(PluginsDeps.tool_build_gradle)
         classpath(PluginsDeps.navigation_safe_args)
         classpath(PluginsDeps.dagger_hilt_compiler)
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.21")
     }
 }
 
