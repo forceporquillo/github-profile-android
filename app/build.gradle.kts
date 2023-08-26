@@ -12,11 +12,11 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 33
     defaultConfig {
         applicationId = "dev.forcecodes.hov"
         minSdk = 23
-        targetSdk = 31
+        targetSdk = 33
         versionCode = 1
         versionName = getSemanticAppVersionName()
 
@@ -102,7 +102,7 @@ dependencies {
 
     implementation(Dependencies.navigation)
     implementation(Dependencies.navigation_ui_ktx)
-    implementation(Dependencies.lifecycle_runtime_ktx)
+   // implementation(Dependencies.lifecycle_runtime_ktx)
     implementation(Dependencies.lifecycle)
     implementation(Dependencies.fragment_ktx)
     implementation(Dependencies.swiperefresh)
