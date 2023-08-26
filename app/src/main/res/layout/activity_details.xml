@@ -86,8 +86,8 @@
                     <dev.forcecodes.hov.widget.CircleImageView
                         android:id="@+id/user_profile"
                         loadImage="@{viewmodel.state.data.id}"
-                        android:layout_width="@dimen/user_profile_size"
-                        android:layout_height="@dimen/user_profile_size"
+                        android:layout_width="96dp"
+                        android:layout_height="96dp"
                         android:layout_marginTop="@dimen/spacing_normal"
                         app:layout_constraintBottom_toBottomOf="@id/display_name"
                         app:layout_constraintStart_toStartOf="@id/guideline_start"
@@ -136,7 +136,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/spacing_small"
-                        android:maxLines="1"
                         android:paddingBottom="@dimen/spacing_small"
                         android:text="@{viewmodel.state.data.bio}"
                         android:textColor="?attr/colorPrimary"

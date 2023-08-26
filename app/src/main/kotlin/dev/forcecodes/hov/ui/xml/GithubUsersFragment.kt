@@ -2,6 +2,9 @@ package dev.forcecodes.hov.ui.xml
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -10,15 +13,16 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.forcecodes.hov.R
 import dev.forcecodes.hov.adapter.GithubUsersPagedAdapter
 import dev.forcecodes.hov.adapter.LoadStateFooterAdapter
+import dev.forcecodes.hov.adapter.OnClickGithubUserListener
 import dev.forcecodes.hov.binding.viewBinding
+import dev.forcecodes.hov.core.internal.Logger
 import dev.forcecodes.hov.databinding.FragmentGithubUsersBinding
 import dev.forcecodes.hov.extensions.launchWithViewLifecycle
 import dev.forcecodes.hov.extensions.launchWithViewLifecycleScope
 import dev.forcecodes.hov.ui.GithubUserViewModel
 import dev.forcecodes.hov.ui.MainActivityViewModel
 import dev.forcecodes.hov.ui.details.DetailsActivity
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -29,8 +33,15 @@ class GithubUsersFragment : Fragment(R.layout.fragment_github_users) {
 
     private val binding by viewBinding(FragmentGithubUsersBinding::bind)
 
-    private val onClickListener = GithubUsersPagedAdapter.OnClickGithubUserListener { info ->
+    private val onClickListener = OnClickGithubUserListener { info ->
         startActivity(DetailsActivity.createIntent(requireContext(), info))
+    }
+
+    fun <T> Any.privateField(name: String): T {
+        val field = this::class.java.getDeclaredField(name)
+        field.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
+        return field.get(this) as T
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -45,6 +56,22 @@ class GithubUsersFragment : Fragment(R.layout.fragment_github_users) {
 
         binding.recyclerView.adapter = pagedAdapter.withLoadStateAdapter(loadStateAdapter)
 
+
+        val filteredSearchAdapter = FilteredSearchAdapter(onClickListener)
+
+        binding.filteredSearchList.adapter = filteredSearchAdapter
+
+        binding.searchView
+            .editText
+            .doAfterTextChanged { text ->
+                text ?: return@doAfterTextChanged
+                viewModel.searchUser(text.toString())
+            }
+
+        val backgroundView = binding.searchView.privateField<View>("backgroundView")
+
+        backgroundView.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.github_gold))
+
         launchWithViewLifecycleScope {
             launch {
                 viewModel
@@ -57,6 +84,12 @@ class GithubUsersFragment : Fragment(R.layout.fragment_github_users) {
                     .refreshState
                     .debounce(DEBOUNCE_DELAY)
                     .collect(::refreshState)
+            }
+
+            launch {
+                viewModel.userSearchResults.collect {
+                    filteredSearchAdapter.submitList(it)
+                }
             }
         }
 

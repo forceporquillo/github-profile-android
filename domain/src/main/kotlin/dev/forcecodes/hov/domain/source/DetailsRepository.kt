@@ -29,6 +29,7 @@ interface DetailsRepository {
     fun getUserDetails(
         details: BasicInfo
     ): Flow<Result<UserDetailsEntity>>
+    fun searchUser(name: String): Flow<Result<List<UserDetailsEntity>>>
 
     fun getRepositories(name: String): Flow<Result<List<RepositoryEntity>>>
     fun getStarredRepositories(name: String): Flow<Result<List<StarredReposEntity>>>
@@ -78,6 +79,21 @@ class DetailsRepositoryImpl @Inject constructor(
             },
             saveFetchResult = {
                 userLocalDataSource.saveUserRepositories(it)
+            }
+        )
+    }
+
+    override fun searchUser(name: String): Flow<Result<List<UserDetailsEntity>>> {
+        return conflateResource(
+            cacheSource = { userLocalDataSource.getUserDetailsFlow(name) },
+            remoteSource = { githubRemoteDataSource.getDetails(name) },
+            saveFetchResult = { data ->
+                userLocalDataSource.saveUserDetails(entityMapper.invoke(data))
+            },
+            shouldFetch = { cache ->
+                // fetch only when db cache is empty or we
+                // forcibly invoked to invalidate
+                cache.isEmpty()
             }
         )
     }

@@ -4,11 +4,11 @@
     <item
         android:title="@string/nav_title_xml"
         android:id="@+id/xml"
-        android:icon="@drawable/ic_xml"/>
+        android:icon="@drawable/ic_android"/>
 
     <item
         android:title="@string/nav_title_compose"
         android:id="@+id/compose"
-        android:icon="@drawable/ic_compose"/>
+        android:icon="@drawable/ic_jetpack_compose"/>
 
 </menu>

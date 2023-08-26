@@ -16,6 +16,7 @@
         android:layout_marginBottom="@dimen/spacing_small_2"
         android:clickable="true"
         android:focusable="true"
+        app:strokeWidth="0dp"
         android:foreground="?attr/selectableItemBackground"
         app:cardCornerRadius="@dimen/spacing_normal">
 
@@ -30,6 +31,7 @@
                 android:layout_height="@dimen/user_profile_size"
                 app:cardCornerRadius="@dimen/spacing_normal"
                 app:cardElevation="0dp"
+                app:strokeWidth="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">

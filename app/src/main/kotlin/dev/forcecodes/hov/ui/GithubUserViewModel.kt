@@ -6,23 +6,26 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.forcecodes.hov.core.data
+import dev.forcecodes.hov.core.internal.Logger
 import dev.forcecodes.hov.core.model.UserUiModel
+import dev.forcecodes.hov.core.successOr
+import dev.forcecodes.hov.data.extensions.cancelWhenActive
 import dev.forcecodes.hov.data.utils.NextPageIndexer
 import dev.forcecodes.hov.domain.usecase.users.ListItemUiState
 import dev.forcecodes.hov.domain.usecase.users.LoadMoreUsersUseCase
 import dev.forcecodes.hov.domain.usecase.users.ObserveGithubUsersInteractor
+import dev.forcecodes.hov.domain.usecase.users.SearchUserUseCase
 import dev.forcecodes.hov.util.notNull
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class GithubUserViewModel @Inject constructor(
     observeGithubUsersInteractor: ObserveGithubUsersInteractor,
+    private val searchUserUseCase: SearchUserUseCase,
     private val nextPageIndexer: NextPageIndexer,
     private val loadMoreUsersUseCase: LoadMoreUsersUseCase,
     private val savedStateHandle: SavedStateHandle
@@ -31,7 +34,8 @@ class GithubUserViewModel @Inject constructor(
     private val lastIndexOrInitial: Int
         get() = savedStateHandle.get(LAST_PAGE_INDEX) ?: INITIAL_PAGE_INDEX
 
-    private val _onLoadMore = MutableStateFlow(lastIndexOrInitial) // Channel<Int>(capacity = Channel.CONFLATED)
+    private val _onLoadMore =
+        MutableStateFlow(lastIndexOrInitial) // Channel<Int>(capacity = Channel.CONFLATED)
     private val loadMoreFlow: Flow<Int> = _onLoadMore
 
     val pagingFlow: Flow<PagingData<UserUiModel>> =
@@ -44,6 +48,13 @@ class GithubUserViewModel @Inject constructor(
     private val onNextPage: (Int) -> Flow<ListItemUiState> = { nextId ->
         loadMoreUsersUseCase.invoke(LoadMoreUsersUseCase.Params(nextId))
     }
+
+    private val _userSearchResults = MutableStateFlow<List<UserUiModel>>(emptyList())
+    val userSearchResults: StateFlow<List<UserUiModel>> = _userSearchResults.asStateFlow()
+
+    private var searchJob: Job? = null
+
+    private val searchQueryBuilder = MutableStateFlow("")
 
     private suspend fun Flow<Int>.onLoadMoreItems(state: (ListItemUiState) -> Unit) {
         flatMapLatest(onNextPage::invoke).collectLatest(state)
@@ -60,6 +71,24 @@ class GithubUserViewModel @Inject constructor(
         if (event is GithubUserUiEvent.OnLoad) {
             _onLoadMore.value = event.since
         }
+        if (event is GithubUserUiEvent.OnSearchUser) {
+            searchJob = executeSearchUser(event.name)
+        }
+    }
+
+    private fun executeSearchUser(name: String) = viewModelScope.launch {
+        flowOf(name)
+            .filter { it.isNotEmpty() }
+            .debounce(750L)
+            .flatMapMerge { query ->
+                Logger.d("Query $query")
+                searchUserUseCase.invoke(
+                    SearchUserUseCase.SearchParams(query)
+                )
+            }.collect {
+                Logger.d("Result $it")
+                _userSearchResults.value = it.successOr(emptyList())
+            }
     }
 
     private fun setPagingSideEffect(uiState: ListItemUiState) {
@@ -82,6 +111,15 @@ class GithubUserViewModel @Inject constructor(
         savedStateHandle[LAST_PAGE_INDEX] = nextPageIndexer
             .takeMaxAndStore(INITIAL_PAGE_INDEX)
         super.onCleared()
+    }
+
+    fun reset() {
+        searchQueryBuilder.value = ""
+    }
+
+    fun searchUser(username: String) {
+        searchJob?.cancelWhenActive()
+        sendEvent(GithubUserUiEvent.OnSearchUser(username))
     }
 
     companion object {

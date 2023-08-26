@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dev.forcecodes.hov.binding.viewBinding
-import dev.forcecodes.hov.core.internal.Logger
 import dev.forcecodes.hov.core.model.UserUiModel
 import dev.forcecodes.hov.databinding.UsersItemLayoutBinding
 import dev.forcecodes.hov.extensions.executeAfter
@@ -73,10 +72,6 @@ internal class GithubUsersPagedAdapter(
         totalItemCount: Int, visibleItemCount: Int, lastVisibleItem: Int
     ): Boolean {
        return visibleItemCount + lastVisibleItem + NEXT_PAGE_THRESHOLD >= totalItemCount
-    }
-
-    fun interface OnClickGithubUserListener {
-        fun onClick(info: Pair<Int, String>)
     }
 
     internal inner class UserVieHolder(

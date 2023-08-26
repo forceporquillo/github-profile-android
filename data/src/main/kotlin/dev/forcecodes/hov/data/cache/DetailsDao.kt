@@ -16,4 +16,7 @@ interface DetailsDao {
     @Query("SELECT * FROM userdetailsentity WHERE id=:id")
     fun getDetails(id: Int): Flow<UserDetailsEntity>
 
+    @Query("SELECT * FROM userdetailsentity WHERE (displayName LIKE :name OR name LIKE :name) AND displayName IS NOT NULL AND name IS NOT NULL")
+    fun getDetails(name: String): Flow<List<UserDetailsEntity>>
+
 }

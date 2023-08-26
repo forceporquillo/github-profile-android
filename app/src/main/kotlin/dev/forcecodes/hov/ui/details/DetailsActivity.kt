@@ -3,15 +3,18 @@ package dev.forcecodes.hov.ui.details
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.view.WindowInsets
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.doOnLayout
+import androidx.core.view.*
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import dev.forcecodes.hov.binding.viewBinding
 import dev.forcecodes.hov.databinding.ActivityDetailsBinding
+import dev.forcecodes.hov.extensions.doOnApplyWindowInsets
 import dev.forcecodes.hov.extensions.updateForTheme
 import dev.forcecodes.hov.theme.ThemeViewModel
 import kotlinx.coroutines.launch
@@ -28,6 +31,7 @@ class DetailsActivity : AppCompatActivity() {
     private val themeViewModel: ThemeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+       // WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
@@ -38,6 +42,11 @@ class DetailsActivity : AppCompatActivity() {
 
         viewModel.getDetails(userExtras)
         subViewModel.sendEvent(LoadUiActions.LoadAll(userExtras.second))
+
+//        binding.appbar.doOnApplyWindowInsets { view, windowInsetsCompat, viewPaddingState ->
+//            val paddingTop = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.statusBars())
+//            binding.appbar.updatePadding(top = paddingTop.top + viewPaddingState.top)
+//        }
 
         lifecycleScope.launch {
             viewModel.finishWhenError.collect { error ->
@@ -53,7 +62,7 @@ class DetailsActivity : AppCompatActivity() {
 
         // adjust scrim trigger offset based on the height of coordinator layout.
         binding.constraintLayout.doOnLayout {
-            binding.coordinatorLayout.scrimVisibleHeightTrigger = it.height * 2
+            binding.coordinatorLayout.scrimVisibleHeightTrigger = it.height
         }
 
         val statePagerAdapter = DetailsStatePagerAdapter(supportFragmentManager)

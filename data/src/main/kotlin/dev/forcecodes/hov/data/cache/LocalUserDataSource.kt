@@ -21,6 +21,8 @@ interface LocalUserDataSource {
     fun saveUserDetails(detailsEntity: UserDetailsEntity)
     fun getUserDetailsFlow(id: Int): Flow<UserDetailsEntity>
 
+    fun getUserDetailsFlow(name: String): Flow<List<UserDetailsEntity>>
+
     suspend fun saveUserRepositories(repos: List<RepositoryEntity>)
     fun getUserRepositoriesFlow(name: String): Flow<List<RepositoryEntity>>
 
@@ -56,6 +58,11 @@ class LocalDataSourceImpl @Inject constructor(
     override fun getUserDetailsFlow(id: Int): Flow<UserDetailsEntity> {
         return appDatabase.userDetails()
             .getDetails(id)
+    }
+
+    override fun getUserDetailsFlow(name: String): Flow<List<UserDetailsEntity>> {
+        return appDatabase.userDetails()
+            .getDetails(name.plus("%"))
     }
 
     override fun getOrganizationsFlow(name: String): Flow<List<OrganizationsEntity>> {
