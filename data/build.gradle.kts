@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import dependencies.Dependencies
 import dependencies.TestDependencies
 import extensions.applyRequiredInjectDeps
@@ -16,6 +17,10 @@ android {
         targetSdk = 33
 
         consumerProguardFiles("consumer-rules.pro")
+
+        val properties = gradleLocalProperties(rootDir)
+        buildConfigField("String", "USERNAME", properties.getProperty("USERNAME", ""))
+        buildConfigField("String", "TOKEN", properties.getProperty("TOKEN", ""))
     }
 
     buildTypes {

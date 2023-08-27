@@ -9,7 +9,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import dev.forcecodes.hov.core.BuildConfig
+import dev.forcecodes.hov.data.BuildConfig
 import dev.forcecodes.hov.data.api.GithubApiService
 import dev.forcecodes.hov.data.extensions.checkMainThread
 import dev.forcecodes.hov.data.extensions.containsNextPage
@@ -19,6 +19,7 @@ import dev.forcecodes.hov.data.internal.InternalApi
 import dev.forcecodes.hov.data.utils.ResponseNextPageLookup
 import okhttp3.Cache
 import okhttp3.CacheControl
+import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -32,9 +33,15 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val DEFAULT_TIMEOUT = 10L
-    private const val CACHE_SIZE = 50 * 1024 * 1024
-    private const val BASE_URL = "https://api.github.com"
+    private const val DEFAULT_TIMEOUT           = 10L // 10 seconds
+    private const val CACHE_SIZE                = 50 * 1024 * 1024 // 50 MiB
+    private const val API_VERSION_HEADER        = "application/vnd.github.v3+json"
+    private const val BASE_URL                  = "https://api.github.com"
+
+    private val credentialsOrNull: String? get() =
+        if (BuildConfig.TOKEN.isNotEmpty() || BuildConfig.USERNAME.isNotEmpty()) {
+            Credentials.basic(BuildConfig.USERNAME, BuildConfig.TOKEN)
+        } else null
 
     @InternalApi
     @Provides
@@ -83,12 +90,14 @@ object NetworkModule {
             }
 
             addInterceptor(Interceptor { chain ->
-                val request = chain.request().newBuilder()
-                    // add token here
-                    //.addHeader("Authorization", "token GITHUB_TOKEN_HERE")
-                    .addHeader("Accept", "application/vnd.github.v3+json")
-                    .build()
+                val builder = chain.request().newBuilder()
+                    .addHeader("Accept", API_VERSION_HEADER)
+                // [Optional] add token here
+                credentialsOrNull?.let { credentials ->
+                    builder.addHeader("Authorization", credentials)
+                }
 
+                val request = builder.build()
                 chain.proceed(request)
             })
 
@@ -130,6 +139,7 @@ object NetworkModule {
     fun providesCacheControl(): CacheControl {
         return CacheControl.Builder()
             .maxAge(2, TimeUnit.MINUTES)
+            .onlyIfCached()
             .build()
     }
 
