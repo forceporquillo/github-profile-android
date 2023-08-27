@@ -1,10 +1,8 @@
-package dev.forcecodes.hov.ui.xml
+package dev.forcecodes.hov.ui.viewsystem
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import dev.forcecodes.hov.adapter.AbstractPaginatedViewHolder
-import dev.forcecodes.hov.adapter.GithubUsersPagedAdapter
 import dev.forcecodes.hov.adapter.OnClickGithubUserListener
 import dev.forcecodes.hov.adapter.UserUiModelComparator
 import dev.forcecodes.hov.binding.viewBinding

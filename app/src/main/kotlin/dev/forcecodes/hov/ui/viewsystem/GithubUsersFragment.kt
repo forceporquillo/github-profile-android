@@ -1,9 +1,8 @@
-package dev.forcecodes.hov.ui.xml
+package dev.forcecodes.hov.ui.viewsystem
 
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,9 +14,7 @@ import dev.forcecodes.hov.adapter.GithubUsersPagedAdapter
 import dev.forcecodes.hov.adapter.LoadStateFooterAdapter
 import dev.forcecodes.hov.adapter.OnClickGithubUserListener
 import dev.forcecodes.hov.binding.viewBinding
-import dev.forcecodes.hov.core.internal.Logger
 import dev.forcecodes.hov.databinding.FragmentGithubUsersBinding
-import dev.forcecodes.hov.extensions.launchWithViewLifecycle
 import dev.forcecodes.hov.extensions.launchWithViewLifecycleScope
 import dev.forcecodes.hov.ui.GithubUserViewModel
 import dev.forcecodes.hov.ui.MainActivityViewModel
