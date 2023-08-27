@@ -3,18 +3,14 @@ package dev.forcecodes.hov.ui.details
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.view.WindowInsets
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.*
-import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import dev.forcecodes.hov.binding.viewBinding
 import dev.forcecodes.hov.databinding.ActivityDetailsBinding
-import dev.forcecodes.hov.extensions.doOnApplyWindowInsets
 import dev.forcecodes.hov.extensions.updateForTheme
 import dev.forcecodes.hov.theme.ThemeViewModel
 import kotlinx.coroutines.launch
@@ -28,7 +24,7 @@ class DetailsActivity : AppCompatActivity() {
     private val binding by viewBinding(ActivityDetailsBinding::inflate)
     private val viewModel by viewModels<DetailsViewModel>()
     private val subViewModel by viewModels<DetailsSubViewModel>()
-    private val themeViewModel: ThemeViewModel by viewModels()
+    private val themeViewModel by viewModels<ThemeViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
        // WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -77,15 +73,9 @@ class DetailsActivity : AppCompatActivity() {
             }
         })
 
-        binding.nestedScrollView.setOnScrollChangeListener { v: NestedScrollView, _, scrollY, _, oldScrollY ->
-            if (v.getChildAt(v.childCount - 1) != null) {
-                if ((scrollY >= (v.getChildAt(v.childCount - 1).measuredHeight - v.measuredHeight)) &&
-                    scrollY > oldScrollY
-                ) {
-                    // end of paging reload all
-                    subViewModel.sendEvent(LoadUiActions.Refresh)
-                }
-            }
+        binding.nestedScrollView.onNextRefresh { refreshAction ->
+            // end of paging reload all
+            subViewModel.sendEvent(refreshAction)
         }
     }
 
