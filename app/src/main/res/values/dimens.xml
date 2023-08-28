@@ -17,8 +17,9 @@
     <dimen name="text_size_medium">14sp</dimen>
     <dimen name="text_size_regular">16sp</dimen>
 
+    <dimen name="content_inset_start_padding">64dp</dimen>
     <dimen name="button_height_default">56dp</dimen>
-    <dimen name="github_icon_size">28dp</dimen>
+    <dimen name="github_icon_size">36dp</dimen>
     <dimen name="spacing_smaller">4dp</dimen>
     <dimen name="header_banner_height">180dp</dimen>
 
