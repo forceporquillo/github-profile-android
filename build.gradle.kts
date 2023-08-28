@@ -22,7 +22,6 @@ buildscript {
         classpath(PluginsDeps.tool_build_gradle)
         classpath(PluginsDeps.navigation_safe_args)
         classpath(PluginsDeps.dagger_hilt_compiler)
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.21")
     }
 }
 
@@ -33,11 +32,11 @@ allprojects {
 subprojects {
     tasks.withType<KotlinCompile>().all {
         kotlinOptions.freeCompilerArgs += listOf(
-            "-Xopt-in=kotlin.RequiresOptIn",
-            "-Xopt-in=kotlin.OptIn",
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=kotlinx.coroutines.ObsoleteCoroutinesApi",
-            "-Xuse-experimental=kotlinx.coroutines.FlowPreview",
+            "-opt-in=kotlin.RequiresOptIn",
+            "-opt-in=kotlin.OptIn",
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-opt-in=kotlinx.coroutines.ObsoleteCoroutinesApi",
+            "-opt-in=kotlinx.coroutines.FlowPreview",
         )
     }
 
