@@ -5,6 +5,9 @@ object Dependencies {
     // Startup
     const val startup_initializers = "androidx.startup:startup-runtime:${Versions.app_initializers}"
 
+    // SplashScreen
+    const val splash_screen = "androidx.core:core-splashscreen:1.0.0"
+
     // Core
     const val core_kt = "androidx.core:core-ktx:${Versions.core_ktx}"
     const val app_compat = "androidx.appcompat:appcompat:${Versions.app_compat}"
