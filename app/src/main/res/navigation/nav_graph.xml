@@ -8,7 +8,7 @@
     <fragment
         app:route="xml"
         android:id="@+id/xml"
-        android:name="dev.forcecodes.hov.ui.xml.GithubUsersFragment"
+        android:name="dev.forcecodes.hov.ui.viewsystem.GithubUsersFragment"
         android:label="GithubUsersFragment"
         tools:layout="@layout/fragment_github_users"/>
 

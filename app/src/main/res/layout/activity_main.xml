@@ -35,7 +35,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentInsetStart="@dimen/button_height_default"
+            app:contentInsetStart="@dimen/content_inset_start_padding"
             app:layout_constraintTop_toTopOf="parent"
             app:title="@string/github_users"
             app:titleTextAppearance="@style/MainToolbarTextAppearance" />
@@ -44,7 +44,7 @@
             android:layout_width="@dimen/github_icon_size"
             android:layout_height="@dimen/github_icon_size"
             android:contentDescription="@null"
-            android:src="@drawable/ic_github"
+            android:src="@drawable/ic_github_search"
             app:layout_constraintBottom_toBottomOf="@id/toolbar"
             app:layout_constraintStart_toStartOf="@id/guideline_start"
             app:layout_constraintTop_toTopOf="@id/toolbar" />
