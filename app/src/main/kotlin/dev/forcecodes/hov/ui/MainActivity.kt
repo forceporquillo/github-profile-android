@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,38 +15,52 @@ import dev.forcecodes.hov.R
 import dev.forcecodes.hov.binding.viewBinding
 import dev.forcecodes.hov.data.theme.Theme
 import dev.forcecodes.hov.databinding.ActivityMainBinding
+import dev.forcecodes.hov.extensions.repeatOnLifecycle
 import dev.forcecodes.hov.extensions.updateForTheme
 import dev.forcecodes.hov.theme.ThemeViewModel
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), OnRefreshListener {
+class MainActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<MainActivityViewModel>()
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
     private val themeViewModel: ThemeViewModel by viewModels()
 
+    @OptIn(FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
-        updateForTheme(themeViewModel.currentTheme)
+
+        currentTheme?.let {
+            if (themeViewModel.currentTheme == it) {
+                updateForTheme(it)
+            }
+        }
+
         setContentView(binding.root)
 
         binding.lifecycleOwner = this
         binding.viewmodel = viewModel
 
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                themeViewModel.theme.collect {
-                    updateForTheme(it)
-                    binding.toggle.isOn = it == Theme.LIGHT
+        repeatOnLifecycle {
+            themeViewModel.theme
+                .onEach {
+                    binding.toggle.isOn = it == Theme.LIGHT || !isInDarkMode()
                 }
-            }
+                .debounce(500L)
+                .collect {
+                    updateForTheme(it)
+                }
         }
 
-        binding.toggle.setOnToggledListener { _, isOn ->
-            themeViewModel.setTheme(if (isOn) Theme.LIGHT else Theme.DARK)
+        binding.toggle.setOnToggledListener { v, isOn ->
+            themeViewModel.setTheme(isOn)
+            v.isOn = !isOn
         }
 
         initNavigation()
@@ -78,13 +93,15 @@ class MainActivity : AppCompatActivity(), OnRefreshListener {
         }
     }
 
-    // unused
-    override fun onRefresh(page: Int) {
-        viewModel.onRefresh(page)
-    }
-
     private fun isInDarkMode(): Boolean {
         val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         return currentNightMode == Configuration.UI_MODE_NIGHT_YES
     }
+
+    private val currentTheme: Theme?
+        get() {
+            @Suppress("deprecation")
+            return intent.extras?.getSerializable("theme") as? Theme
+        }
+
 }

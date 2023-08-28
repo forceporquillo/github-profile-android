@@ -11,7 +11,24 @@ import dev.forcecodes.hov.databinding.ItemOrganizationLayoutBinding
 import dev.forcecodes.hov.domain.usecase.details.OrgsUiModel
 
 class OrganizationsAdapter : ListAdapter<OrgsUiModel,
-        OrganizationsAdapter.OrganizationsViewHolder>(OrganizationsUiModelDiff()) {
+        OrganizationsAdapter.OrganizationsViewHolder>(OrganizationsUiModelDiff) {
+
+    companion object {
+
+        private val OrganizationsUiModelDiff = object: DiffUtil.ItemCallback<OrgsUiModel>() {
+            override fun areItemsTheSame(oldItem: OrgsUiModel, newItem: OrgsUiModel): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(
+                oldItem: OrgsUiModel,
+                newItem: OrgsUiModel
+            ): Boolean {
+                return oldItem == newItem
+            }
+        }
+
+    }
 
     class OrganizationsViewHolder(
         binding: ItemOrganizationLayoutBinding
@@ -24,19 +41,6 @@ class OrganizationsAdapter : ListAdapter<OrgsUiModel,
                 orgBio.text = data.description
                 orgAvatar.loadImage(data.id)
             }
-        }
-    }
-
-    private class OrganizationsUiModelDiff : DiffUtil.ItemCallback<OrgsUiModel>() {
-        override fun areItemsTheSame(oldItem: OrgsUiModel, newItem: OrgsUiModel): Boolean {
-            return oldItem.id == newItem.id
-        }
-
-        override fun areContentsTheSame(
-            oldItem: OrgsUiModel,
-            newItem: OrgsUiModel
-        ): Boolean {
-            return oldItem == newItem
         }
     }
 

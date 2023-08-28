@@ -28,7 +28,7 @@ class DetailsSubViewModel @Inject constructor(
         get() = savedStateHandle.get<String>("details_name") ?: field
         private set
 
-    private val _repositories = MutableStateFlow<ReposViewState>(ReposViewState())
+    private val _repositories = MutableStateFlow(ReposViewState())
     val repositories: StateFlow<ReposViewState> = _repositories
 
     private val _organizations = MutableStateFlow<List<OrgsUiModel>>(emptyList())

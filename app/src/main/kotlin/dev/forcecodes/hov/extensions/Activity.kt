@@ -24,9 +24,12 @@ fun AppCompatActivity.updateForTheme(theme: Theme) = when (theme) {
     Theme.BATTERY_SAVER -> delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 }
 
-inline fun AppCompatActivity.repeatOnLifecycle(crossinline block: suspend () -> Unit) {
+inline fun AppCompatActivity.repeatOnLifecycle(
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+    crossinline block: suspend () -> Unit
+) {
     lifecycleScope.launch {
-        repeatOnLifecycle(Lifecycle.State.STARTED) {
+        repeatOnLifecycle(lifecycleState) {
             block.invoke()
         }
     }

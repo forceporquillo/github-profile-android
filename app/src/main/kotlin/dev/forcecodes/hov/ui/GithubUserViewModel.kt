@@ -6,7 +6,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.forcecodes.hov.core.data
 import dev.forcecodes.hov.core.internal.Logger
 import dev.forcecodes.hov.core.model.UserUiModel
 import dev.forcecodes.hov.core.successOr
@@ -32,7 +31,7 @@ class GithubUserViewModel @Inject constructor(
 ) : BaseViewModel<ListItemUiState, GithubUserUiEvent>(ListItemUiState.initial()) {
 
     private val lastIndexOrInitial: Int
-        get() = savedStateHandle.get(LAST_PAGE_INDEX) ?: INITIAL_PAGE_INDEX
+        get() = savedStateHandle[LAST_PAGE_INDEX] ?: INITIAL_PAGE_INDEX
 
     private val _onLoadMore =
         MutableStateFlow(lastIndexOrInitial) // Channel<Int>(capacity = Channel.CONFLATED)
@@ -53,8 +52,6 @@ class GithubUserViewModel @Inject constructor(
     val userSearchResults: StateFlow<List<UserUiModel>> = _userSearchResults.asStateFlow()
 
     private var searchJob: Job? = null
-
-    private val searchQueryBuilder = MutableStateFlow("")
 
     private suspend fun Flow<Int>.onLoadMoreItems(state: (ListItemUiState) -> Unit) {
         flatMapLatest(onNextPage::invoke).collectLatest(state)
@@ -79,7 +76,7 @@ class GithubUserViewModel @Inject constructor(
     private fun executeSearchUser(name: String) = viewModelScope.launch {
         flowOf(name)
             .filter { it.isNotEmpty() }
-            .debounce(750L)
+            .debounce(TIME_OUT_MILLIS)
             .flatMapMerge { query ->
                 Logger.d("Query $query")
                 searchUserUseCase.invoke(
@@ -113,10 +110,6 @@ class GithubUserViewModel @Inject constructor(
         super.onCleared()
     }
 
-    fun reset() {
-        searchQueryBuilder.value = ""
-    }
-
     fun searchUser(username: String) {
         searchJob?.cancelWhenActive()
         sendEvent(GithubUserUiEvent.OnSearchUser(username))
@@ -128,6 +121,7 @@ class GithubUserViewModel @Inject constructor(
             initialLoadSize = 60
         )
         private const val INITIAL_PAGE_INDEX = 0
+        private const val TIME_OUT_MILLIS = 1000L
     }
 }
 

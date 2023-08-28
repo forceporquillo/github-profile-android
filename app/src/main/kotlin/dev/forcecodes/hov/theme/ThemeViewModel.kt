@@ -9,6 +9,7 @@ import dev.forcecodes.hov.core.data
 import dev.forcecodes.hov.data.theme.Theme
 import dev.forcecodes.hov.domain.usecase.theme.GetAvailableThemesUseCase
 import dev.forcecodes.hov.domain.usecase.theme.SetThemeUseCase
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
@@ -32,8 +33,11 @@ class ThemeViewModel @Inject constructor(
         emit(getAvailableThemesUseCase(GetAvailableThemesUseCase.Params()).data ?: listOf())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
-    fun setTheme(theme: Theme) {
-        viewModelScope.launch {
+    private var themeChangeJob: Job? = null
+
+    fun setTheme(isLight: Boolean) {
+        themeChangeJob = viewModelScope.launch {
+            val theme = if (isLight) Theme.LIGHT else Theme.DARK
             setThemeUseCase.invoke(SetThemeUseCase.Params(theme))
         }
     }

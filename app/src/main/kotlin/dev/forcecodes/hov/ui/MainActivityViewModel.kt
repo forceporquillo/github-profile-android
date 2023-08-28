@@ -56,7 +56,7 @@ class MainActivityViewModel @Inject constructor(
     }
 
     private fun GithubUserUiEvent.loadPage(): Int {
-        return if (this is GithubUserUiEvent.OnRefresh) this.page else 0
+        return if (this is GithubUserUiEvent.OnRefresh) page else 0
     }
 
     fun onRefresh(page: Int) {
