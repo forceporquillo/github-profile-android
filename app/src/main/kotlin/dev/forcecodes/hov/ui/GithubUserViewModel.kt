@@ -6,7 +6,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.forcecodes.hov.core.internal.Logger
 import dev.forcecodes.hov.core.model.UserUiModel
 import dev.forcecodes.hov.core.successOr
 import dev.forcecodes.hov.data.extensions.cancelWhenActive
@@ -17,7 +16,20 @@ import dev.forcecodes.hov.domain.usecase.users.ObserveGithubUsersInteractor
 import dev.forcecodes.hov.domain.usecase.users.SearchUserUseCase
 import dev.forcecodes.hov.util.notNull
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -73,19 +85,18 @@ class GithubUserViewModel @Inject constructor(
         }
     }
 
-    private fun executeSearchUser(name: String) = viewModelScope.launch {
-        flowOf(name)
-            .filter { it.isNotEmpty() }
-            .debounce(TIME_OUT_MILLIS)
-            .flatMapMerge { query ->
-                Logger.d("Query $query")
-                searchUserUseCase.invoke(
-                    SearchUserUseCase.SearchParams(query)
-                )
-            }.collect {
-                Logger.d("Result $it")
-                _userSearchResults.value = it.successOr(emptyList())
-            }
+    private fun executeSearchUser(name: String): Job {
+        return viewModelScope.launch {
+            flowOf(name)
+                .filterNot { it.isEmpty() }
+                .debounce(TIME_OUT_MILLIS)
+                .map(SearchUserUseCase::SearchParams)
+                .flatMapMerge(transform = searchUserUseCase::invoke)
+                .onEach { uiModelResult ->
+                    _userSearchResults.value = uiModelResult.successOr(emptyList())
+                }
+                .collect()
+        }
     }
 
     private fun setPagingSideEffect(uiState: ListItemUiState) {
