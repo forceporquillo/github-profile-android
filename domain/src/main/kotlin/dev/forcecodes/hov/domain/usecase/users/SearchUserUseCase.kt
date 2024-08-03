@@ -2,6 +2,7 @@ package dev.forcecodes.hov.domain.usecase.users
 
 import dev.forcecodes.hov.core.Result
 import dev.forcecodes.hov.core.error
+import dev.forcecodes.hov.core.fold
 import dev.forcecodes.hov.core.model.UserUiModel
 import dev.forcecodes.hov.core.qualifiers.IoDispatcher
 import dev.forcecodes.hov.core.successOr
@@ -23,21 +24,15 @@ class SearchUserUseCase @Inject constructor(
     class SearchParams(val name: String) : UseCaseParams.Params()
 
     override fun execute(parameters: SearchParams): Flow<Result<List<UserUiModel>>> {
-        return detailsRepository.searchUser(parameters.name)
-            .map { result ->
-                when (result) {
-                    is Result.Success -> {
-                        val filteredUsers = result.successOr(emptyList()).map { entity ->
-                            UserUiModel.User(
-                                id = entity.id,
-                                name = entity.name
-                            )
-                        }
-                        Result.Success(filteredUsers)
-                    }
-                    is Result.Loading -> Result.Loading()
-                    is Result.Error -> Result.Error(result.error)
+        return detailsRepository.searchUser(parameters.name).map { result ->
+            result.fold(onSuccess = {
+                val filteredUsers = result.successOr(emptyList()).map { entity ->
+                    UserUiModel.User(id = entity.id, name = entity.name)
                 }
-            }
+                Result.Success(filteredUsers)
+            }, onFailure = {
+                Result.Error(result.error)
+            })
+        }
     }
 }

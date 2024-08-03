@@ -19,8 +19,12 @@ android {
         consumerProguardFiles("consumer-rules.pro")
 
         val properties = gradleLocalProperties(rootDir)
-        buildConfigField("String", "USERNAME", properties.getProperty("USERNAME", ""))
-        buildConfigField("String", "TOKEN", properties.getProperty("TOKEN", ""))
+
+        val username = properties.getProperty("USERNAME", "")
+        val token = properties.getProperty("TOKEN", "")
+
+        buildConfigField("String", "USERNAME", "\"$username\"")
+        buildConfigField("String", "TOKEN", "\"$token\"")
     }
 
     buildTypes {
@@ -32,14 +36,19 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+    }
+
+    kotlin {
+        jvmToolchain(17)
+    }
 }
 
 dependencies {

@@ -1,5 +1,6 @@
 package dev.forcecodes.hov.data.extensions
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.SendChannel
 
@@ -7,9 +8,11 @@ import kotlinx.coroutines.channels.SendChannel
 /**
  * Cancel the Job when it's active.
  */
-fun Job.cancelWhenActive() {
+fun Job.cancelWhenActive(
+    cancellationException: CancellationException? = null
+) {
     if (isActive) {
-        cancel()
+        cancel(cancellationException)
     }
 }
 

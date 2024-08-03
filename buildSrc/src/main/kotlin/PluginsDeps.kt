@@ -9,7 +9,7 @@ object PluginsDeps {
 
     object Version {
         const val kotlin_deps = "1.7.21"
-        const val build_gradle_deps = "7.2.2"
+        const val build_gradle_deps = "7.4.2"
         const val nav_safe_args = "2.4.2"
         const val dagger_gradle_plugin = "2.42"
     }

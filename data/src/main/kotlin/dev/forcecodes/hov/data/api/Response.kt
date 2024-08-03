@@ -13,6 +13,13 @@ import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
+internal suspend fun <T> getResponse(
+    // redundant dispatcher since Retrofit
+    // uses handles this internally.
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    block: suspend () -> Response<T>
+): ApiResponse<T> = block.invoke().getResponse(dispatcher)
+
 /**
  * A Network bound resource implementation.
  *
@@ -20,17 +27,12 @@ import java.net.UnknownHostException
  * so we can explicitly catch our custom exception needed to throw instead of relying to
  * OkHttp's exception internally.
  */
-internal suspend fun <T> getResponse(
-    // redundant dispatcher since Retrofit
-    // uses handles this internally.
-    dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    block: suspend () -> Response<T>
+internal suspend fun <T> Response<T>.getResponse(
+    dispatcher: CoroutineDispatcher = Dispatchers.IO
 ): ApiResponse<T> = withContext(dispatcher) {
     try {
-        val response = block.invoke()
-        val body = response.body()
-
-        if (response.isSuccessful && response.code() == GithubStatusCodes.Ok().status) {
+        val body = body()
+        if (isSuccessful && code() == GithubStatusCodes.Ok().status) {
             if (body == null) {
                 ApiResponse.Empty("Empty response")
             } else {
@@ -39,10 +41,10 @@ internal suspend fun <T> getResponse(
         } else {
             val forbidden = GithubStatusCodes.Forbidden()
 
-            if (response.code() == forbidden.status) {
+            if (code() == forbidden.status) {
                 ApiResponse.Error(forbidden.message)
             } else {
-                response.parseErrorResponse()
+                parseErrorResponse()
             }
         }
     } catch (e: Exception) {
@@ -59,7 +61,7 @@ private fun <T> Response<T>.parseErrorResponse(): ApiResponse.Error<T> {
         val errorBody = errorBody()!!.charStream().readText()
         return ApiResponse.Error(errorBody)
     } catch (e: JsonDataException) {
-        ApiResponse.Error("Failed to parse response from server.")
+        ApiResponse.Error("Failed to parse response from server, $e")
     } catch (e: Exception) {
         ApiResponse.Error(e.message)
     }

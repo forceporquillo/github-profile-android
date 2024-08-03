@@ -2,9 +2,13 @@
 
 package dev.forcecodes.hov.core
 
+import dev.forcecodes.hov.core.Result.Error
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * A generic class that holds a value with its loading status.
@@ -22,6 +26,22 @@ sealed class Result<out R> {
             is Error -> "Error[exception=$exception]"
             is Loading<*> -> "Loading"
         }
+    }
+}
+
+@OptIn(ExperimentalContracts::class)
+inline fun <R, T> Result<T>.fold(
+    onSuccess: (value: T?) -> R,
+    onFailure: (exception: Throwable) -> R
+): R {
+    contract {
+        callsInPlace(onSuccess, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(onFailure, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (succeeded) {
+        onSuccess(data)
+    } else {
+        onFailure(error)
     }
 }
 
@@ -71,7 +91,7 @@ inline fun <T> Result<T>.collectAsState(
     return when (this) {
         is Result.Loading -> loading.invoke(data)
         is Result.Success -> success.invoke(data)
-        is Result.Error -> error.invoke(exception)
+        is Error -> error.invoke(exception)
     }
 }
 
@@ -105,7 +125,7 @@ val <T> Result<T>.data: T?
  * `true` if [Result] is of type [Result.Error].
  */
 val <T> Result<T>.error: java.lang.Exception
-    get() = (this as Result.Error).exception
+    get() = (this as Error).exception
 
 /**
  * asserts the [Result] to a non-nullable [Result.Success] & holds non-null [Result.Success.data]. Otherwise, throws [Result.error].

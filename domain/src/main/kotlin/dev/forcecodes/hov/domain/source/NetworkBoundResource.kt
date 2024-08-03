@@ -3,12 +3,14 @@ package dev.forcecodes.hov.domain.source
 import dev.forcecodes.hov.core.Result
 import dev.forcecodes.hov.core.internal.Logger
 import dev.forcecodes.hov.data.api.*
+import dev.forcecodes.hov.domain.DataStrategy
 import kotlinx.coroutines.flow.*
 
 abstract class NetworkBoundResource {
 
     protected inline fun <Cache, Remote> conflateResource(
         requireLoad: Boolean = true,
+        strategy: DataStrategy = DataStrategy.Cache,
         crossinline cacheSource: () -> Flow<Cache>,
         crossinline remoteSource: suspend () -> ApiResponse<Remote>,
         crossinline saveFetchResult: suspend (Remote) -> Unit,
