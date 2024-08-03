@@ -1,4 +1,4 @@
-rootProject.name = "CodeAssignment"
+rootProject.name = "AndroidGithub"
 include(":app")
 include(":core")
 include(":domain")

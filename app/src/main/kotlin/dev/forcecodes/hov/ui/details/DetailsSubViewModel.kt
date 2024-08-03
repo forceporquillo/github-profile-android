@@ -1,7 +1,6 @@
 package dev.forcecodes.hov.ui.details
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.forcecodes.hov.domain.usecase.details.DetailsViewState
 import dev.forcecodes.hov.domain.usecase.details.ObserveOrgsUseCase
@@ -10,10 +9,10 @@ import dev.forcecodes.hov.domain.usecase.details.ObserveStarredUseCase
 import dev.forcecodes.hov.domain.usecase.details.OrgsUiModel
 import dev.forcecodes.hov.domain.usecase.details.ReposViewState
 import dev.forcecodes.hov.domain.usecase.details.StarredUiModel
+import dev.forcecodes.hov.extensions.launchAndCollect
 import dev.forcecodes.hov.ui.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,30 +37,24 @@ class DetailsSubViewModel @Inject constructor(
     val starredRepos: StateFlow<List<StarredUiModel>> = _starredRepos
 
     private fun loadUserRepositories(name: String) {
-        viewModelScope.launch {
+        launchAndCollect(useCase = {
             val params = ObserveReposUseCase.Params(name)
-            observeReposUseCase.invoke(params).collect { uiModel ->
-                _repositories.value = uiModel
-            }
-        }
+            observeReposUseCase.invoke(params)
+        }) { uiModel -> _repositories.value = uiModel }
     }
 
     private fun loadOrganizations(name: String) {
-        viewModelScope.launch {
+        launchAndCollect(useCase = {
             val params = ObserveOrgsUseCase.Params(name)
-            observeOrgsUseCase.invoke(params).collect { uiModel ->
-                _organizations.value = uiModel
-            }
-        }
+            observeOrgsUseCase.invoke(params)
+        }) { uiModel -> _organizations.value = uiModel }
     }
 
     private fun loadStarredRepositories(name: String) {
-        viewModelScope.launch {
+        launchAndCollect(useCase = {
             val params = ObserveStarredUseCase.Params(name)
-            observeStarredUseCase.invoke(params).collect { uiModel ->
-                _starredRepos.value = uiModel
-            }
-        }
+            observeStarredUseCase.invoke(params)
+        }) { uiModel -> _starredRepos.value = uiModel }
     }
 
     private var currentItemPos: Int = 0
@@ -75,19 +68,16 @@ class DetailsSubViewModel @Inject constructor(
             is LoadUiActions.LoadAll -> {
                 // make copy for our refresh state
                 this.name = event.name
-                loadUserRepositories(event.name)
-                loadOrganizations(event.name)
-                loadStarredRepositories(event.name)
+                loadUserRepositories(name)
+                loadOrganizations(name)
+                loadStarredRepositories(name)
             }
+
             is LoadUiActions.Refresh -> {
-                if (currentItemPos == 0) {
-                    loadUserRepositories(name)
-                }
-                if (currentItemPos == 1) {
-                    loadOrganizations(name)
-                }
-                if (currentItemPos == 2) {
-                    loadStarredRepositories(name)
+                when (currentItemPos) {
+                    0 -> loadUserRepositories(name)
+                    1 -> loadOrganizations(name)
+                    2 -> loadStarredRepositories(name)
                 }
             }
         }

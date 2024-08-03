@@ -3,7 +3,6 @@ package dev.forcecodes.hov.ui.viewsystem
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -53,21 +52,25 @@ class GithubUsersFragment : Fragment(R.layout.fragment_github_users) {
 
         binding.recyclerView.adapter = pagedAdapter.withLoadStateAdapter(loadStateAdapter)
 
-
         val filteredSearchAdapter = FilteredSearchAdapter(onClickListener)
 
         binding.filteredSearchList.adapter = filteredSearchAdapter
 
         binding.searchView
             .editText
-            .doAfterTextChanged { text ->
-                text ?: return@doAfterTextChanged
-                viewModel.searchUser(text.toString())
-            }
+            .textChanges()
+            .onEach { query ->
+                viewModel.searchUser(query)
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         val backgroundView = binding.searchView.privateField<View>("backgroundView")
 
-        backgroundView.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.github_gold))
+        backgroundView.setBackgroundColor(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.github_gold
+            )
+        )
 
         launchWithViewLifecycleScope {
             launch {

@@ -1,14 +1,13 @@
 package dev.forcecodes.hov.ui
 
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.forcecodes.hov.data.extensions.cancelWhenActive
 import dev.forcecodes.hov.domain.usecase.users.ListItemUiState
 import dev.forcecodes.hov.domain.usecase.users.RefreshUsersUseCase
+import dev.forcecodes.hov.extensions.launchAndCollect
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,20 +30,21 @@ class MainActivityViewModel @Inject constructor(
     private var refreshJob: Job? = null
 
     private fun executeRefresh(oldState: ListItemUiState, page: Int, refresh: Boolean) {
-        refreshJob = viewModelScope.launch {
-            refreshUsersUseCase.invoke(RefreshUsersUseCase.Params(page)).collect { uiState ->
-                setState(
-                    oldState.copy(
-                        hasItems = uiState.hasItems,
-                        isLoading = uiState should refresh,
-                        error = uiState.error
-                    )
+        refreshJob = launchAndCollect(useCase = {
+            val params = RefreshUsersUseCase.Params(page)
+            refreshUsersUseCase.invoke(params)
+        }) { uiState ->
+            setState(
+                oldState.copy(
+                    hasItems = uiState.hasItems,
+                    isLoading = uiState should refresh,
+                    error = uiState.error
                 )
-                if (!refresh) {
-                    return@collect
-                }
-                sideEffect(uiState)
+            )
+            if (!refresh) {
+                return@launchAndCollect
             }
+            sideEffect(uiState)
         }
     }
 

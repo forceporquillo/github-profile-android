@@ -14,23 +14,17 @@ import dev.forcecodes.hov.domain.usecase.users.ListItemUiState
 import dev.forcecodes.hov.domain.usecase.users.LoadMoreUsersUseCase
 import dev.forcecodes.hov.domain.usecase.users.ObserveGithubUsersInteractor
 import dev.forcecodes.hov.domain.usecase.users.SearchUserUseCase
+import dev.forcecodes.hov.extensions.launchAndCollect
 import dev.forcecodes.hov.util.notNull
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,7 +51,8 @@ class GithubUserViewModel @Inject constructor(
     val loadMoreEffect: StateFlow<LoadMoreEffect> = _loadMoreEffect
 
     private val onNextPage: (Int) -> Flow<ListItemUiState> = { nextId ->
-        loadMoreUsersUseCase.invoke(LoadMoreUsersUseCase.Params(nextId))
+        val params = LoadMoreUsersUseCase.Params(nextId)
+        loadMoreUsersUseCase.invoke(params)
     }
 
     private val _userSearchResults = MutableStateFlow<List<UserUiModel>>(emptyList())
@@ -65,14 +60,12 @@ class GithubUserViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
-    private suspend fun Flow<Int>.onLoadMoreItems(state: (ListItemUiState) -> Unit) {
-        flatMapLatest(onNextPage::invoke).collectLatest(state)
+    private fun Flow<Int>.onLoadMoreItems(state: (ListItemUiState) -> Unit) {
+        flatMapLatest(onNextPage::invoke).onEach { state.invoke(it) }.launchIn(viewModelScope)
     }
 
     init {
-        viewModelScope.launch {
-            loadMoreFlow.onLoadMoreItems(::setPagingSideEffect)
-        }
+        loadMoreFlow.onLoadMoreItems(::setPagingSideEffect)
         observeGithubUsersInteractor.invoke(ObserveGithubUsersInteractor.Params(PAGING_CONFIG))
     }
 
@@ -85,28 +78,20 @@ class GithubUserViewModel @Inject constructor(
         }
     }
 
-    private fun executeSearchUser(name: String): Job {
-        return viewModelScope.launch {
-            flowOf(name)
-                .filterNot { it.isEmpty() }
-                .debounce(TIME_OUT_MILLIS)
-                .map(SearchUserUseCase::SearchParams)
-                .flatMapMerge(transform = searchUserUseCase::invoke)
-                .onEach { uiModelResult ->
-                    _userSearchResults.value = uiModelResult.successOr(emptyList())
-                }
-                .collect()
-        }
+    private fun executeSearchUser(query: CharSequence): Job = launchAndCollect({
+        val params = SearchUserUseCase.SearchParams(query.toString())
+        searchUserUseCase.invoke(params)
+    }) { uiResult ->
+        _userSearchResults.value = uiResult.successOr(emptyList())
     }
 
     private fun setPagingSideEffect(uiState: ListItemUiState) {
-        _loadMoreEffect.value = if (uiState.error.notNull()
-            && nextPageIndexer.takeMaxAndStore(-1) != 0
-        ) {
-            LoadMoreEffect.Error(uiState.error)
-        } else {
-            LoadMoreEffect.Nominal
-        }
+        _loadMoreEffect.value =
+            if (uiState.error.notNull() && nextPageIndexer.takeMaxAndStore(-1) != 0) {
+                LoadMoreEffect.Error(uiState.error)
+            } else {
+                LoadMoreEffect.Nominal
+            }
         setState(uiState)
     }
 
@@ -116,20 +101,18 @@ class GithubUserViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        savedStateHandle[LAST_PAGE_INDEX] = nextPageIndexer
-            .takeMaxAndStore(INITIAL_PAGE_INDEX)
+        savedStateHandle[LAST_PAGE_INDEX] = nextPageIndexer.takeMaxAndStore(INITIAL_PAGE_INDEX)
         super.onCleared()
     }
 
-    fun searchUser(username: String) {
-        searchJob?.cancelWhenActive()
-        sendEvent(GithubUserUiEvent.OnSearchUser(username))
+    fun searchUser(query: CharSequence) {
+        searchJob?.cancelWhenActive(CancellationException("Search query interrupted"))
+        sendEvent(GithubUserUiEvent.OnSearchUser(query))
     }
 
     companion object {
         val PAGING_CONFIG = PagingConfig(
-            pageSize = 30,
-            initialLoadSize = 60
+            pageSize = 30, initialLoadSize = 60
         )
         private const val INITIAL_PAGE_INDEX = 0
         private const val TIME_OUT_MILLIS = 1000L
