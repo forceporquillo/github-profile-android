@@ -1,14 +1,11 @@
 package dev.forcecodes.hov.domain.source
 
 import android.os.Build
-import dev.forcecodes.hov.core.BuildConfig
 import dev.forcecodes.hov.core.Result
 import dev.forcecodes.hov.core.internal.Logger
 import dev.forcecodes.hov.data.api.ApiResponse
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,7 +29,6 @@ class UserDetailsKeyIndexPagination @Inject constructor() : NetworkBoundResource
         } else {
             userPageMap[userName] ?: 1
         }
-        Logger.d("PagingIndex userName: $userName page: $lastPage")
         conflateResource(
             fetchBehavior = FetchBehavior.FetchSilently,
             cacheSource = { cacheSource.invoke() },
