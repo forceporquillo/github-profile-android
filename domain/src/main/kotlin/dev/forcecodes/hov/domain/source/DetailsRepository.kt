@@ -8,7 +8,6 @@ import dev.forcecodes.hov.data.api.models.StarredReposEntity
 import dev.forcecodes.hov.data.cache.LocalUserDataSource
 import dev.forcecodes.hov.data.cache.entity.OrganizationsEntity
 import dev.forcecodes.hov.data.cache.entity.UserDetailsEntity
-import dev.forcecodes.hov.domain.FailureStrategy
 import dev.forcecodes.hov.domain.di.DETAILS_REPOS
 import dev.forcecodes.hov.domain.di.STARRED_REPOS
 import dev.forcecodes.hov.domain.di.USER_ORGS

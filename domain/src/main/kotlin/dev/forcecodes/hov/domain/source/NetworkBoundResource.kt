@@ -8,7 +8,6 @@ import dev.forcecodes.hov.data.api.EmptyResponseException
 import dev.forcecodes.hov.data.api.onEmpty
 import dev.forcecodes.hov.data.api.onError
 import dev.forcecodes.hov.data.api.onSuccess
-import dev.forcecodes.hov.domain.FailureStrategy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.firstOrNull
@@ -18,6 +17,11 @@ import kotlinx.coroutines.flow.map
 typealias RemoteNetworkCall<Remote> = suspend () -> ApiResponse<Remote>
 typealias LocalDatabaseCache<Cache> = suspend () -> Flow<Cache>
 typealias ResponseAccumulator<Remote> = suspend (Remote) -> Unit
+
+sealed interface FailureStrategy {
+    object ThrowSilently : FailureStrategy
+    object ThrowOnFailure: FailureStrategy
+}
 
 sealed interface FetchBehavior {
     object FetchSilently : FetchBehavior
@@ -45,14 +49,14 @@ suspend fun <Remote, Response> RemoteNetworkCall<Remote>.execute(
 
 open class NetworkBoundResource {
 
-    internal fun <Cache, Remote> conflateResource(
+    internal fun <Local, Remote> conflateResource(
         fetchBehavior: FetchBehavior = FetchBehavior.FetchWithProgress,
         strategy: FailureStrategy = FailureStrategy.ThrowSilently,
-        cacheSource: LocalDatabaseCache<Cache>,
+        cacheSource: LocalDatabaseCache<Local>,
         remoteSource: RemoteNetworkCall<Remote>,
         accumulator: ResponseAccumulator<Remote>,
-        shouldFetch: (Cache?) -> Boolean = { true }
-    ): Flow<Result<Cache>> = flow {
+        shouldFetch: (Local?) -> Boolean = { true }
+    ): Flow<Result<Local>> = flow {
 
         if (fetchBehavior.isFetchWithProgress) {
             emit(Result.Loading())
