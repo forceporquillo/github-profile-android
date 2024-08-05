@@ -1,7 +1,9 @@
 package dev.forcecodes.hov.data.prefs
 
 import android.content.Context
+import android.content.SharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.forcecodes.hov.data.utils.NextPageIndexer
 import javax.inject.Inject
 
 /**
@@ -17,24 +19,24 @@ class NextLinkSharedPreference @Inject constructor(
     @ApplicationContext context: Context
 ) : LinkPreference {
 
-    private val prefs by lazy {
-        context.getSharedPreferences(USER_NEXT_LINK, Context.MODE_PRIVATE)
-    }
+    private val prefs by context.nextLinkSharedPref()
 
     override var nextPage: Int? = prefs.getInt(NEXT_PAGE, 0)
         set(value) {
             if (field != value) {
-                val prefsEditor = prefs.edit()
-                if (value != null) {
+                if (value != null && value > (field ?: 0)) {
+                    val prefsEditor = prefs.edit()
                     prefsEditor.putInt(NEXT_PAGE, value).apply()
                     field = value
                 }
             }
         }
 
-    companion object {
-        private const val NEXT_PAGE = "next-page"
-        private const val USER_NEXT_LINK = "user_next_link"
-    }
-
 }
+
+fun Context.nextLinkSharedPref() = lazy {
+    getSharedPreferences(USER_NEXT_LINK, Context.MODE_PRIVATE)
+}
+
+private const val NEXT_PAGE = "next-page"
+private const val USER_NEXT_LINK = "user_next_link"
