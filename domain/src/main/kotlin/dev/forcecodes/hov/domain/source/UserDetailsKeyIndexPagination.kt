@@ -1,5 +1,7 @@
 package dev.forcecodes.hov.domain.source
 
+import android.os.Build
+import dev.forcecodes.hov.core.BuildConfig
 import dev.forcecodes.hov.core.Result
 import dev.forcecodes.hov.core.internal.Logger
 import dev.forcecodes.hov.data.api.ApiResponse
@@ -16,49 +18,29 @@ import javax.inject.Singleton
 @Singleton
 class UserDetailsKeyIndexPagination @Inject constructor() : NetworkBoundResource() {
 
-    private var lastPage = 1
-
-    private var pageName: String? = null
-
-    private var isRequestInProgress = false
-
-    private val fetchMap = ConcurrentHashMap<String, Int>()
+    private val userPageMap = HashMap<String, Int>()
 
     @PublishedApi
     internal fun <Remote, Cache> requestData(
-        name: String,
+        userName: String,
         cacheSource: () -> Flow<Cache>,
         remoteSource: suspend (page: Int) -> ApiResponse<Remote>,
         saveFetchResult: suspend (Remote) -> Unit,
     ): Flow<Result<Cache>> = flow {
-
-        if (fetchMap.containsKey(name)) {
-
-        }
-
-        if (pageName == name) {
-            Logger.e("Adding new emitter: $name $lastPage")
+        val lastPage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            userPageMap.getOrDefault(userName, 1)
         } else {
-            pageName = name
-            lastPage = 1
-            Logger.e("OnLoadMore: $name $lastPage")
+            userPageMap[userName] ?: 1
         }
-
-        emitAll(
-            conflateResource(
-                fetchBehavior = FetchBehavior.FetchSilently,
-                cacheSource = {
-                    cacheSource.invoke()
-                },
-                remoteSource = {
-                    isRequestInProgress = true
-                    remoteSource.invoke(lastPage)
-                },
-                accumulator = {
-                    lastPage++
-                    saveFetchResult.invoke(it)
-                }
-            )
-        )
+        Logger.d("PagingIndex userName: $userName page: $lastPage")
+        conflateResource(
+            fetchBehavior = FetchBehavior.FetchSilently,
+            cacheSource = { cacheSource.invoke() },
+            remoteSource = { remoteSource.invoke(lastPage) },
+            accumulator = {
+                userPageMap[userName] = lastPage + 1
+                saveFetchResult.invoke(it)
+            }
+        ).collect(this)
     }
 }

@@ -19,4 +19,6 @@ interface DetailsDao {
     @Query("SELECT * FROM userdetailsentity WHERE (displayName LIKE :name OR name LIKE :name) AND displayName IS NOT NULL AND name IS NOT NULL")
     fun getDetails(name: String): Flow<List<UserDetailsEntity>>
 
+    @Query("SELECT * FROM userdetailsentity WHERE name = :name")
+    suspend fun getUserDetails(name: String): UserDetailsEntity
 }

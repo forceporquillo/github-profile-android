@@ -9,6 +9,7 @@ import dev.forcecodes.hov.data.cache.entity.UserEntity
 import dev.forcecodes.hov.data.internal.InternalApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,6 +23,8 @@ interface LocalUserDataSource {
     fun getUserDetailsFlow(id: Int): Flow<UserDetailsEntity>
 
     fun getUserDetailsFlow(name: String): Flow<List<UserDetailsEntity>>
+
+    suspend fun getUserDetails(name: String): UserDetailsEntity
 
     suspend fun saveUserRepositories(repos: List<RepositoryEntity>)
     fun getUserRepositoriesFlow(name: String): Flow<List<RepositoryEntity>>
@@ -67,6 +70,13 @@ class LocalDataSourceImpl @Inject constructor(
     override fun getUserDetailsFlow(name: String): Flow<List<UserDetailsEntity>> {
         return appDatabase.userDetails()
             .getDetails(name.plus("%"))
+    }
+
+    override suspend fun getUserDetails(name: String): UserDetailsEntity {
+        return withContext(dispatcher) {
+            appDatabase.userDetails()
+                .getUserDetails(name)
+        }
     }
 
     override fun getOrganizationsFlow(name: String): Flow<List<OrganizationsEntity>> {

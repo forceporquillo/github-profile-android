@@ -35,7 +35,7 @@ class OrganizationEntityMapper @Inject constructor() :
 }
 
 @Singleton
-class StarredReposEntityEntityMapper @Inject constructor() :
+class StarredReposEntityMapper @Inject constructor() :
     EntityMapper<StarredResponse, String, StarredReposEntity> {
 
     override fun invoke(data: StarredResponse, map: String): StarredReposEntity {

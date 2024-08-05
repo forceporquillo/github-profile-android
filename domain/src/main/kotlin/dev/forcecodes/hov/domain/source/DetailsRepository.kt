@@ -13,7 +13,7 @@ import dev.forcecodes.hov.domain.di.DETAILS_REPOS
 import dev.forcecodes.hov.domain.di.STARRED_REPOS
 import dev.forcecodes.hov.domain.di.USER_ORGS
 import dev.forcecodes.hov.domain.mapper.OrganizationEntityMapper
-import dev.forcecodes.hov.domain.mapper.StarredReposEntityEntityMapper
+import dev.forcecodes.hov.domain.mapper.StarredReposEntityMapper
 import dev.forcecodes.hov.domain.mapper.UserDetailsEntityMapper
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -34,7 +34,7 @@ interface DetailsRepository {
 
 class DetailsRepositoryImpl @Inject constructor(
     private val organizationEntityMapper: OrganizationEntityMapper,
-    private val starredReposEntityEntityMapper: StarredReposEntityEntityMapper,
+    private val starredReposEntity: StarredReposEntityMapper,
     private val userLocalDataSource: LocalUserDataSource,
     private val githubRemoteDataSource: GithubRemoteDataSource,
     private val entityMapper: UserDetailsEntityMapper,
@@ -45,34 +45,11 @@ class DetailsRepositoryImpl @Inject constructor(
 
     override fun getUserDetails(details: BasicInfo): Flow<Result<UserDetailsEntity>> {
         return conflateResource(
-            strategy = FailureStrategy.ThrowOnFailure,
-            cacheSource = {
-                userLocalDataSource.getUserDetailsFlow(details.id)
-            },
-            remoteSource = {
-                githubRemoteDataSource.getDetails(details.name)
-            },
-            accumulator = {
-                userLocalDataSource.saveUserDetails(entityMapper.invoke(it))
-            },
-            shouldFetch = {
-                it == null
-            }
-        )
-    }
-
-    override fun getRepositories(name: String): Flow<Result<List<RepositoryEntity>>> {
-        return detailsPagination.requestData(
-            name,
-            cacheSource = {
-                userLocalDataSource.getUserRepositoriesFlow(name)
-            },
-            remoteSource = { page ->
-                githubRemoteDataSource.getRepositories(name, page, 100)
-            },
-            saveFetchResult = {
-                userLocalDataSource.saveUserRepositories(it)
-            }
+            cacheSource = { userLocalDataSource.getUserDetailsFlow(details.id) },
+            remoteSource = { githubRemoteDataSource.getDetails(details.name) },
+            accumulator = { data -> userLocalDataSource.saveUserDetails(entityMapper.invoke(data)) },
+            shouldFetch = { cache -> cache == null },
+            strategy = FailureStrategy.ThrowOnFailure
         )
     }
 
@@ -80,9 +57,7 @@ class DetailsRepositoryImpl @Inject constructor(
         return conflateResource(
             cacheSource = { userLocalDataSource.getUserDetailsFlow(name) },
             remoteSource = { githubRemoteDataSource.getDetails(name) },
-            accumulator = { data ->
-                userLocalDataSource.saveUserDetails(entityMapper.invoke(data))
-            },
+            accumulator = { data -> userLocalDataSource.saveUserDetails(entityMapper.invoke(data)) },
             shouldFetch = { cache ->
                 // fetch only when db cache is empty or we
                 // forcibly invoked to invalidate
@@ -92,42 +67,45 @@ class DetailsRepositoryImpl @Inject constructor(
         )
     }
 
+    override fun getRepositories(name: String): Flow<Result<List<RepositoryEntity>>> {
+        return detailsPagination.requestData(
+            userName = name,
+            cacheSource = { userLocalDataSource.getUserRepositoriesFlow(name) },
+            remoteSource = { page -> githubRemoteDataSource.getRepositories(name, page, MAX_FETCH_SIZE) },
+            saveFetchResult = { ownRepos -> userLocalDataSource.saveUserRepositories(ownRepos) }
+        )
+    }
+
     override fun getStarredRepositories(name: String): Flow<Result<List<StarredReposEntity>>> {
         return startedReposPagination.requestData(
-            name,
-            cacheSource = {
-                userLocalDataSource.getStarredRepositoresFlow(name)
-            },
-            remoteSource = {
-                githubRemoteDataSource.getStarredRepositories(name, it, 100)
-            },
-            saveFetchResult = {
-                val entity = it.map { starred ->
-                    starredReposEntityEntityMapper.invoke(starred, name)
+            userName = name,
+            cacheSource = { userLocalDataSource.getStarredRepositoresFlow(name) },
+            remoteSource = { page -> githubRemoteDataSource.getStarredRepositories(name, page, MAX_FETCH_SIZE) },
+            saveFetchResult = { starredRepos ->
+                val mappedStarredRepos = starredRepos.map { repo ->
+                    starredReposEntity.invoke(repo, name)
                 }
-                userLocalDataSource.saveStarredRepositores(entity)
+                userLocalDataSource.saveStarredRepositores(mappedStarredRepos)
             }
         )
     }
 
     override fun getOrganizations(name: String): Flow<Result<List<OrganizationsEntity>>> {
         return organizationsPagination.requestData(
-            name,
-            cacheSource = {
-                userLocalDataSource.getOrganizationsFlow(name)
-            },
-            remoteSource = { page ->
-                githubRemoteDataSource.getOrganizations(name, page, 100)
-            },
-            saveFetchResult = {
-
-                val entity = it.map { org ->
-                    organizationEntityMapper.invoke(org, Owner(name, "23"))
+            userName = name,
+            cacheSource = { userLocalDataSource.getOrganizationsFlow(name) },
+            remoteSource = { page -> githubRemoteDataSource.getOrganizations(name, page, MAX_FETCH_SIZE) },
+            saveFetchResult = { orgs ->
+                if (orgs.isNotEmpty()) {
+                    val details = userLocalDataSource.getUserDetails(name)
+                    val mappedOrgs = orgs.map { org ->
+                        organizationEntityMapper.invoke(org, Owner(name, details.id.toString()))
+                    }
+                    userLocalDataSource.saveOrganizations(mappedOrgs)
                 }
-
-                userLocalDataSource.saveOrganizations(entity)
             }
         )
     }
 }
 
+private const val MAX_FETCH_SIZE = 20
