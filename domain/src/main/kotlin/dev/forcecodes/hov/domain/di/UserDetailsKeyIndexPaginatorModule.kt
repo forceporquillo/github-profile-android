@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import dev.forcecodes.hov.domain.source.UserDetailsKeyIndexPaginator
+import dev.forcecodes.hov.domain.source.UserDetailsKeyIndexPagination
 import javax.inject.Named
 
 @Module
@@ -13,20 +13,20 @@ object UserDetailsKeyIndexPaginatorModule {
 
     @Provides
     @Named(DETAILS_REPOS)
-    fun providesRepositoriesKeyPaginator(): UserDetailsKeyIndexPaginator {
-        return UserDetailsKeyIndexPaginator()
+    fun providesRepositoriesKeyPaginator(): UserDetailsKeyIndexPagination {
+        return UserDetailsKeyIndexPagination()
     }
 
     @Provides
     @Named(STARRED_REPOS)
-    fun providesStarredReposKeyPaginator(): UserDetailsKeyIndexPaginator {
-        return UserDetailsKeyIndexPaginator()
+    fun providesStarredReposKeyPaginator(): UserDetailsKeyIndexPagination {
+        return UserDetailsKeyIndexPagination()
     }
 
     @Provides
     @Named(USER_ORGS)
-    fun providesUserOrgsKeyPaginator(): UserDetailsKeyIndexPaginator {
-        return UserDetailsKeyIndexPaginator()
+    fun providesUserOrgsKeyPaginator(): UserDetailsKeyIndexPagination {
+        return UserDetailsKeyIndexPagination()
     }
 }
 

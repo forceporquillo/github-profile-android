@@ -17,7 +17,7 @@ import kotlin.contracts.contract
 sealed class Result<out R> {
 
     data class Success<out T>(val data: T) : Result<T>()
-    data class Error<out T>(val exception: Exception, val data: T? = null) : Result<T>()
+    data class Error<out T>(val exception: Throwable, val data: T? = null) : Result<T>()
     data class Loading<out T>(val data: T? = null) : Result<T>()
 
     override fun toString(): String {
@@ -29,6 +29,12 @@ sealed class Result<out R> {
     }
 }
 
+/**
+ * Returns the result of [onSuccess] for the encapsulated value if this instance represents [success][Result.isSuccess]
+ * or the result of [onFailure] function for the encapsulated [Throwable] exception if it is [failure][Result.isFailure].
+ *
+ * Note, that this function rethrows any [Throwable] exception thrown by [onSuccess] or by [onFailure] function.
+ */
 @OptIn(ExperimentalContracts::class)
 inline fun <R, T> Result<T>.fold(
     onSuccess: (value: T?) -> R,
@@ -86,7 +92,7 @@ fun <T : Result<K>, K> loadingFlow(
 inline fun <T> Result<T>.collectAsState(
     loading: (T?) -> Unit = {},
     success: (T) -> Unit = {},
-    error: (Exception) -> Unit = {}
+    error: (Throwable) -> Unit = {}
 ) {
     return when (this) {
         is Result.Loading -> loading.invoke(data)
@@ -124,7 +130,7 @@ val <T> Result<T>.data: T?
 /**
  * `true` if [Result] is of type [Result.Error].
  */
-val <T> Result<T>.error: java.lang.Exception
+val <T> Result<T>.error: Throwable
     get() = (this as Error).exception
 
 /**

@@ -15,10 +15,10 @@ import javax.inject.Singleton
 
 interface LocalUserDataSource {
 
-    fun saveUsers(users: List<UserEntity>)
+    suspend fun saveUsers(users: List<UserEntity>)
     fun getUserFlow(): Flow<List<UserEntity>>
 
-    fun saveUserDetails(detailsEntity: UserDetailsEntity)
+    suspend fun saveUserDetails(detailsEntity: UserDetailsEntity)
     fun getUserDetailsFlow(id: Int): Flow<UserDetailsEntity>
 
     fun getUserDetailsFlow(name: String): Flow<List<UserDetailsEntity>>
@@ -40,9 +40,11 @@ class LocalDataSourceImpl @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : LocalUserDataSource {
 
-    override fun saveUsers(users: List<UserEntity>) {
-        appDatabase.userDao()
-            .saveUsers(users)
+    override suspend fun saveUsers(users: List<UserEntity>) {
+        withContext(dispatcher) {
+            appDatabase.userDao()
+                .saveUsers(users)
+        }
     }
 
     override fun getUserFlow(): Flow<List<UserEntity>> {
@@ -50,9 +52,11 @@ class LocalDataSourceImpl @Inject constructor(
             .getUsers()
     }
 
-    override fun saveUserDetails(detailsEntity: UserDetailsEntity) {
-        appDatabase.userDetails()
-            .saveDetails(detailsEntity)
+    override suspend fun saveUserDetails(detailsEntity: UserDetailsEntity) {
+        withContext(dispatcher) {
+            appDatabase.userDetails()
+                .saveDetails(detailsEntity)
+        }
     }
 
     override fun getUserDetailsFlow(id: Int): Flow<UserDetailsEntity> {
@@ -79,9 +83,11 @@ class LocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun saveOrganizations(orgs: List<OrganizationsEntity>) {
-        provider.runAsTransaction {
-            appDatabase.organizationsDao()
-                .saveAll(orgs)
+        withContext(dispatcher) {
+            provider.runAsTransaction {
+                appDatabase.organizationsDao()
+                    .saveAll(orgs)
+            }
         }
     }
 
@@ -90,9 +96,11 @@ class LocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun saveStarredRepositores(repos: List<StarredReposEntity>) {
-        provider.runAsTransaction {
-            appDatabase.starredReposDao()
-                .saveAll(repos)
+        withContext(dispatcher) {
+            provider.runAsTransaction {
+                appDatabase.starredReposDao()
+                    .saveAll(repos)
+            }
         }
     }
 

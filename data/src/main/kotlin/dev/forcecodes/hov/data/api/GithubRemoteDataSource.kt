@@ -41,7 +41,7 @@ class GithubRemoteDataSource @Inject constructor(
         }
     }
 
-    suspend fun getRepositories1(
+    suspend fun getRepositories(
         name: String,
         page: Int,
         size: Int
@@ -51,7 +51,7 @@ class GithubRemoteDataSource @Inject constructor(
         }
     }
 
-    suspend fun getStarredRepositories1(
+    suspend fun getStarredRepositories(
         name: String,
         page: Int,
         size: Int

@@ -49,15 +49,15 @@ class UserRepositoryImpl @Inject constructor(
     private fun <T> loadFromResource(
         invalidate: Boolean = true,
         remoteDataSource: suspend () -> ApiResponse<T>,
-        localDataSource: (T) -> Unit
+        localDataSource: suspend (T) -> Unit
     ): Flow<Result<List<UserEntity>>> = conflateResource(
         cacheSource = { userLocalDataSource.getUserFlow() },
-        remoteSource = { remoteDataSource.invoke() },
-        saveFetchResult = { data -> localDataSource.invoke(data) },
+        remoteSource = { remoteDataSource() },
+        accumulator = { data -> localDataSource(data) },
         shouldFetch = { cache ->
             // fetch only when db cache is empty or we
             // forcibly invoked to invalidate
-            cache.isEmpty() || invalidate
+            cache?.isEmpty() == true || invalidate
         }
     )
 
