@@ -36,7 +36,7 @@
                 android:padding="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Top Profiles"/>
+                android:text="@string/top_profiles"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
