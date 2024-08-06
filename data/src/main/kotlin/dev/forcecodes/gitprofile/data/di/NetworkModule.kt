@@ -10,7 +10,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.forcecodes.gitprofile.data.BuildConfig
+import dev.forcecodes.gitprofile.data.api.ConnectivityInterceptor
 import dev.forcecodes.gitprofile.data.api.GithubApiService
+import dev.forcecodes.gitprofile.data.api.NetworkStatusProvider
 import dev.forcecodes.gitprofile.data.extensions.checkMainThread
 import dev.forcecodes.gitprofile.data.extensions.containsNextPage
 import dev.forcecodes.gitprofile.data.extensions.delegatingCallFactory
@@ -51,6 +53,12 @@ object NetworkModule {
 
     @InternalApi
     @Provides
+    internal fun provideConnectivityInterceptor(@InternalApi networkStatusProvider: NetworkStatusProvider): ConnectivityInterceptor {
+        return ConnectivityInterceptor(networkStatusProvider)
+    }
+
+    @InternalApi
+    @Provides
     internal fun providesRetrofit(
         @InternalApi moshi: Moshi,
         @InternalApi okHttpClient: Lazy<OkHttpClient>
@@ -65,7 +73,7 @@ object NetworkModule {
     @InternalApi
     @Provides
     internal fun providesOkHttpLoggingInterceptor(): HttpLoggingInterceptor {
-        return HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.HEADERS }
+        return HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
     }
 
     @InternalApi
@@ -75,7 +83,8 @@ object NetworkModule {
     internal fun providesOkHttpClient(
         @InternalApi cache: Cache,
         @InternalApi cacheInterceptor: Interceptor,
-        @InternalApi interceptor: HttpLoggingInterceptor
+        @InternalApi httpLoggingInterceptor: HttpLoggingInterceptor,
+        @InternalApi connectivityInterceptor: ConnectivityInterceptor
     ): OkHttpClient = checkMainThread {
         OkHttpClient.Builder().apply {
             connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
@@ -86,12 +95,15 @@ object NetworkModule {
             cache(cache)
 
             if (BuildConfig.DEBUG) {
-                addInterceptor(interceptor)
+                addInterceptor(httpLoggingInterceptor)
             }
+
+            addInterceptor(connectivityInterceptor)
 
             addInterceptor(Interceptor { chain ->
                 val builder = chain.request().newBuilder()
                     .addHeader("Accept", API_VERSION_HEADER)
+                    .addHeader("User-Agent", USER_AGENT)
                 // [Optional] add token here
                 credentialsOrNull?.let { credentials ->
                     builder.addHeader("Authorization", credentials)
@@ -151,3 +163,7 @@ object NetworkModule {
     ): GithubApiService = retrofit.create()
 }
 
+
+// hardcoded for the meantime
+private const val APP_NAME = "dev.forcecodes.android.githubprofile"
+private val USER_AGENT by lazy { "developer: ${BuildConfig.USERNAME} app-name: $APP_NAME" }
