@@ -23,4 +23,5 @@
     <dimen name="spacing_smaller">4dp</dimen>
     <dimen name="header_banner_height">180dp</dimen>
 
+    <dimen name="m3_searchview_divider_size">1px</dimen>
 </resources>

@@ -1,7 +1,7 @@
-package dev.forcecodes.hov.data
+package dev.forcecodes.gitprofile.data
 
-import dev.forcecodes.hov.data.paginator.NextPageLinkStore
-import dev.forcecodes.hov.data.prefs.LinkPreference
+import dev.forcecodes.gitprofile.data.paginator.NextPageLinkStore
+import dev.forcecodes.gitprofile.data.prefs.LinkPreference
 import okhttp3.Headers
 import org.junit.Assert
 import org.junit.Before

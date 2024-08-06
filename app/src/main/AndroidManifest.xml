@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="dev.forcecodes.hov">
+    package="dev.forcecodes.android.gitprofile">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -34,11 +34,11 @@
 
         <provider
             android:name="androidx.startup.InitializationProvider"
-            android:authorities="dev.forcecodes.hov.androidx-startup"
+            android:authorities="dev.forcecodes.android.gitprofile.androidx-startup"
             android:exported="false"
             tools:node="merge">
             <meta-data
-                android:name="dev.forcecodes.hov.initializer.TimberInitializer"
+                android:name="dev.forcecodes.android.gitprofile.initializer.TimberInitializer"
                 android:value="androidx.startup" />
         </provider>
     </application>

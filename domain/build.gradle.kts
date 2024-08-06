@@ -3,15 +3,17 @@ import dependencies.Dependencies
 plugins {
     id(Plugins.android_library)
     kotlin(Plugins.android_kotlin)
-    kotlin(Plugins.kapt)
+    id(Plugins.ksp)
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 35
+
+    buildFeatures.buildConfig = true
 
     defaultConfig {
-        minSdk = 23
-        targetSdk = 33
+        minSdk = 24
+        namespace = "dev.forcecodes.gitprofile.domain"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -50,5 +52,5 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 
     implementation(Dependencies.hilt_android)
-    kapt(Dependencies.hilt_compiler)
+    ksp(Dependencies.hilt_compiler)
 }

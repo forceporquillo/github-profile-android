@@ -8,14 +8,14 @@
     <fragment
         app:route="xml"
         android:id="@+id/xml"
-        android:name="dev.forcecodes.hov.ui.viewsystem.GithubUsersFragment"
+        android:name="dev.forcecodes.android.gitprofile.ui.viewsystem.GithubUsersFragment"
         android:label="GithubUsersFragment"
         tools:layout="@layout/fragment_github_users"/>
 
     <fragment
         app:route="xml"
         android:id="@+id/compose"
-        android:name="dev.forcecodes.hov.ui.compose.GithubUsersComposeFragment"
+        android:name="dev.forcecodes.android.gitprofile.ui.compose.GithubUsersComposeFragment"
         android:label="GithubUsersComposeFragment" />
 
 </navigation>

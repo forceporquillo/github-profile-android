@@ -7,7 +7,7 @@
 
         <variable
             name="viewmodel"
-            type="dev.forcecodes.hov.ui.details.DetailsViewModel" />
+            type="dev.forcecodes.android.gitprofile.ui.details.DetailsViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -83,7 +83,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         tools:src="@tools:sample/cities" />
 
-                    <dev.forcecodes.hov.widget.CircleImageView
+                    <dev.forcecodes.android.gitprofile.widget.CircleImageView
                         android:id="@+id/user_profile"
                         loadImage="@{viewmodel.state.data.id}"
                         android:layout_width="96dp"
@@ -279,7 +279,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <dev.forcecodes.hov.ui.details.DetailsWrapContentViewPager
+                <dev.forcecodes.android.gitprofile.ui.details.DetailsWrapContentViewPager
                     android:id="@+id/view_pager"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />

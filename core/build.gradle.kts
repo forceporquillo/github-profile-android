@@ -3,16 +3,18 @@ import dependencies.Dependencies
 plugins {
     id(Plugins.android_library)
     kotlin(Plugins.android_kotlin)
-    kotlin(Plugins.kapt)
+    id(Plugins.ksp)
 }
 
 
 android {
-    compileSdk = 33
+    compileSdk = 35
+
+    buildFeatures.buildConfig = true
 
     defaultConfig {
-        minSdk = 23
-        targetSdk = 33
+        minSdk = 24
+        namespace = "dev.forcecodes.gitprofile.core"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -45,7 +47,7 @@ android {
         jvmToolchain(17)
     }
 
-    packagingOptions {
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -55,7 +57,7 @@ android {
 dependencies {
 
     implementation(Dependencies.hilt_android)
-    kapt(Dependencies.hilt_compiler)
+    ksp(Dependencies.hilt_compiler)
 
     api(Dependencies.kotlin_coroutines_core)
     api(Dependencies.kotlin_stdlib)

@@ -2,24 +2,26 @@ import dependencies.Dependencies
 import dependencies.TestDependencies
 import dependencies.Versions
 import extensions.applyRequiredInjectDeps
+import extensions.implementation
 
 plugins {
     id(Plugins.android)
     kotlin(Plugins.android_kotlin)
+    kotlin(Plugins.serialization)
     kotlin(Plugins.kapt)
-    kotlin("plugin.serialization")
     id(Plugins.dagger_hilt)
 }
 
 android {
-    compileSdk = 33
-    defaultConfig {
-        applicationId = "dev.forcecodes.hov"
-        minSdk = 23
-        targetSdk = 33
-        versionCode = 1
-        versionName = getSemanticAppVersionName()
+    compileSdk = 35
 
+    defaultConfig {
+        applicationId = "dev.forcecodes.android.gitprofile"
+        minSdk = 24
+        targetSdk = 35
+        versionCode = 1
+        namespace = "dev.forcecodes.android.gitprofile"
+        versionName = getSemanticAppVersionName()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables {
@@ -64,10 +66,10 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = Versions.compose
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
 
-    packagingOptions {
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -107,15 +109,16 @@ dependencies {
     implementation(Dependencies.navigation)
     implementation(Dependencies.navigation_ui_ktx)
    // implementation(Dependencies.lifecycle_runtime_ktx)
-    implementation(Dependencies.lifecycle)
+    implementation(Dependencies.lifecycle_viewmodel)
+    implementation(Dependencies.lifecycle_viewmodel_ktx)
+    implementation(Dependencies.lifecycle_savedstate)
+
     implementation(Dependencies.fragment_ktx)
     implementation(Dependencies.swiperefresh)
 
     implementation(Dependencies.splash_screen)
 
     implementation(Dependencies.glide)
-    implementation("androidx.appcompat:appcompat:1.4.1")
-    implementation("com.google.android.material:material:1.5.0")
     kapt(Dependencies.glide_kapt)
 
     // Toggle switch

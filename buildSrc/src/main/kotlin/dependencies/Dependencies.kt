@@ -1,3 +1,5 @@
+@file:Suppress("ConstPropertyName")
+
 package dependencies
 
 object Dependencies {
@@ -33,9 +35,12 @@ object Dependencies {
     const val swiperefresh = "androidx.swiperefreshlayout:swiperefreshlayout:${Versions.swipefresh}"
 
     // Lifecycle
-    const val lifecycle = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle}"
+   // const val lifecycle = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle}"
    // const val livedata_ktx = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle}"
    // const val lifecycle_runtime_ktx = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}"
+    const val lifecycle_savedstate = "androidx.lifecycle:lifecycle-viewmodel-savedstate:${Versions.lifecycle}"
+    const val lifecycle_viewmodel = "androidx.lifecycle:lifecycle-viewmodel:${Versions.lifecycle}"
+    const val lifecycle_viewmodel_ktx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
 
     // Dagger2
     const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
@@ -57,6 +62,7 @@ object Dependencies {
 
     // Paging
     const val paging = "androidx.paging:paging-runtime:${Versions.paging}"
+    const val room_paging = "androidx.room:room-paging:${Versions.room_paging}"
 
     // DataStore
     const val datastore_prefs = "androidx.datastore:datastore-preferences:${Versions.datastore_prefs}"

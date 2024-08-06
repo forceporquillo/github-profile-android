@@ -22,11 +22,19 @@ buildscript {
         classpath(PluginsDeps.tool_build_gradle)
         classpath(PluginsDeps.navigation_safe_args)
         classpath(PluginsDeps.dagger_hilt_compiler)
+        classpath(PluginsDeps.ksp)
     }
 }
 
 allprojects {
     repositories.applyDefaults()
+
+    configurations.all {
+        resolutionStrategy {
+            force("androidx.lifecycle:lifecycle-viewmodel:2.5.1")
+            force("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+        }
+    }
 }
 
 subprojects {
@@ -56,5 +64,5 @@ subprojects {
 }
 
 tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
+    delete(rootProject.layout.buildDirectory)
 }
