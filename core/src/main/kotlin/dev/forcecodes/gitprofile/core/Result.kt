@@ -31,8 +31,8 @@ sealed class Result<out R> {
 }
 
 /**
- * Returns the result of [onSuccess] for the encapsulated value if this instance represents [success][Result.isSuccess]
- * or the result of [onFailure] function for the encapsulated [Throwable] exception if it is [failure][Result.isFailure].
+ * Returns the result of [onSuccess] for the encapsulated value if this instance represents [success][Result.succeeded]
+ * or the result of [onFailure] function for the encapsulated [Throwable] exception if it is [failure][Result.error].
  *
  * Note, that this function rethrows any [Throwable] exception thrown by [onSuccess] or by [onFailure] function.
  */
@@ -50,6 +50,30 @@ inline fun <R, T> Result<T>.fold(
     } else {
         onFailure(error)
     }
+}
+
+/**
+ * Returns the result of [onSuccess] for the encapsulated value if this instance represents [success][Result.succeeded]
+ * or the result of [onFailure] function for the encapsulated [Throwable] exception if it is [failure][Result.error]
+ * or otherwise the [onLoading] function for notifying of loading state, equivalent to [Result.isLoadingState].
+ *
+ * Note, that this function rethrows any [Throwable] exception thrown by [onSuccess] or by [onFailure] function.
+ */
+@OptIn(ExperimentalContracts::class)
+inline fun <R, T> Result<T>.foldable(
+    onLoading: () -> R,
+    onSuccess: (value: T?) -> R,
+    onFailure: (exception: Throwable) -> R
+) : R {
+   contract {
+        callsInPlace(onSuccess, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(onFailure, InvocationKind.AT_MOST_ONCE)
+   }
+   return if (this is Result.Loading) {
+        onLoading()
+   } else {
+       fold(onSuccess, onFailure)
+   }
 }
 
 /**
