@@ -1,7 +1,7 @@
 package dev.forcecodes.gitprofile.domain.usecase.details
 
-import dev.forcecodes.gitprofile.core.Result
 import dev.forcecodes.gitprofile.core.UiState
+import dev.forcecodes.gitprofile.core.foldable
 import dev.forcecodes.gitprofile.core.internal.Logger
 import dev.forcecodes.gitprofile.core.model.DetailsUiModel
 import dev.forcecodes.gitprofile.core.qualifiers.IoDispatcher
@@ -29,33 +29,30 @@ class GetUserDetailsUseCase @Inject constructor(
         return detailsRepository.getUserDetails(
             BasicInfo(parameters.id, parameters.name)
         ).map { result ->
-            when (result) {
-                is Result.Success -> {
+            result.foldable(
+                {
                     DetailsViewState(
-                        data = detailsUiMapper.invoke(result.data),
+                        data = null,
+                        isLoading = true,
+                        error = null
+                    )
+                },
+                { entity ->
+                    DetailsViewState(
+                        data = detailsUiMapper.invoke(entity),
                         isLoading = false,
                         error = null
                     )
-                }
-
-                is Result.Error -> {
-                    Logger.e("Error: ${result.exception}")
+                },
+                { exception ->
+                    Logger.e("Error: $exception")
                     DetailsViewState(
-                        data = detailsUiMapper.invoke(result.data),
+                        data = null,
                         isLoading = false,
-                        error = result.exception.message
+                        error = exception.message
                     )
                 }
-
-                is Result.Loading -> {
-                    val viewState = detailsUiMapper.invoke(result.data)
-                    DetailsViewState(
-                        data = viewState,
-                        isLoading = viewState == null,
-                        error = null
-                    )
-                }
-            }
+            )
         }
     }
 

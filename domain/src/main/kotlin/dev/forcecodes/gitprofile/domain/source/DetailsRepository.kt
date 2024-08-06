@@ -62,7 +62,8 @@ class DetailsRepositoryImpl @Inject constructor(
                 // forcibly invoked to invalidate
                 cache?.isEmpty() == true
             },
-            fetchBehavior = FetchBehavior.FetchSilently
+            fetchBehavior = FetchBehavior.FetchSilently,
+            strategy = FailureStrategy.ThrowOnFailure
         )
     }
 

@@ -28,14 +28,15 @@ class SearchUserUseCase @Inject constructor(
         return detailsRepository.searchUser(parameters.name)
             .filterNot { it is Result.Loading }
             .map { result ->
-            result.fold(onSuccess = {
-                val filteredUsers = result.successOr(emptyList()).map { entity ->
-                    UserUiModel.User(id = entity.id, name = entity.name)
-                }
-                Result.Success(filteredUsers)
-            }, onFailure = {
-                Result.Error(result.error)
-            })
-        }
+                result.fold(
+                    onSuccess = {
+                        val filteredUsers = result.successOr(emptyList()).map { entity ->
+                            UserUiModel.User(id = entity.id, name = entity.name)
+                        }
+                        Result.Success(filteredUsers)
+                    }, onFailure = {
+                        Result.Error(result.error)
+                    })
+            }
     }
 }

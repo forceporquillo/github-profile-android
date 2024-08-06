@@ -7,13 +7,13 @@ import dev.forcecodes.gitprofile.core.successOr
 import dev.forcecodes.gitprofile.domain.source.DetailsRepository
 import dev.forcecodes.gitprofile.domain.usecase.BaseFlowUseCase
 import dev.forcecodes.gitprofile.domain.usecase.UseCaseParams
+import dev.forcecodes.gitprofile.domain.utils.numberFormatter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import org.json.JSONException
 import org.json.JSONObject
-import java.text.NumberFormat
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -24,8 +24,6 @@ class ObserveStarredUseCase @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : BaseFlowUseCase<ObserveStarredUseCase.Params, List<StarredUiModel>>(dispatcher) {
 
-    private val numberFormatter = NumberFormat.getNumberInstance()
-
     class Params(
         val name: String
     ) : UseCaseParams.Params()
@@ -33,18 +31,7 @@ class ObserveStarredUseCase @Inject constructor(
     override fun execute(parameters: Params): Flow<List<StarredUiModel>> {
         return detailsRepository.getStarredRepositories(parameters.name).map { result ->
             if (result is Result.Loading) {
-                result.data?.map { entity ->
-                    StarredUiModel(
-                        id = entity.id,
-                        name = entity.owner?.login,
-                        description = entity.description,
-                        language = entity.language,
-                        starredCount = formatStarredCount(entity.stargazersCount),
-                        repoName = entity.name,
-                        ownerId = entity.owner?.id,
-                        color = getColor(entity.language)
-                    )
-                } ?: emptyList()
+                emptyList()
             } else {
                 result.successOr(emptyList()).map { entity ->
                     StarredUiModel(
@@ -59,7 +46,6 @@ class ObserveStarredUseCase @Inject constructor(
                     )
                 }
             }
-
         }.distinctUntilChanged()
     }
 

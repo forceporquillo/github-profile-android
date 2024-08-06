@@ -1,6 +1,7 @@
 package dev.forcecodes.gitprofile.domain.usecase.users
 
 import dev.forcecodes.gitprofile.core.Result
+import dev.forcecodes.gitprofile.core.foldable
 import dev.forcecodes.gitprofile.data.cache.entity.UserEntity
 import dev.forcecodes.gitprofile.domain.usecase.BaseFlowUseCase
 import dev.forcecodes.gitprofile.domain.usecase.UseCaseParams
@@ -14,27 +15,26 @@ abstract class LoadResourceUseCase<in T : UseCaseParams.Params>(
 
     override fun execute(parameters: T): Flow<ListItemUiState> {
         return fromSource(parameters).map { result ->
-            when (result) {
-                is Result.Success -> {
+            result.foldable(
+                onLoading = {
                     ListItemUiState(
-                        hasItems = result.data.isNotEmpty(),
+                        hasItems = false,
+                        isLoading = true,
+                    )
+                },
+                onSuccess = {
+                    ListItemUiState(
+                        hasItems = it?.isNotEmpty() == true,
                         isLoading = false,
                     )
-                }
-                is Result.Error -> {
+                },
+                onFailure = {
                     ListItemUiState(
-                        hasItems = result.data?.isNotEmpty() ?: false,
-                        isLoading = false,
-                        error = result.exception.message,
-                    )
-                }
-                is Result.Loading -> {
-                    ListItemUiState(
-                        hasItems = result.data?.isNotEmpty() ?: false,
+                        hasItems = false,
                         isLoading = true,
                     )
                 }
-            }
+            )
         }
     }
 

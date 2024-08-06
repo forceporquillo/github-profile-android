@@ -8,7 +8,6 @@ import dev.forcecodes.gitprofile.domain.source.UsersRepository
 import dev.forcecodes.gitprofile.domain.usecase.UseCaseParams
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -1,18 +1,18 @@
 package dev.forcecodes.gitprofile.domain.usecase.details
 
-import dev.forcecodes.gitprofile.core.Result
+import dev.forcecodes.gitprofile.core.foldable
 import dev.forcecodes.gitprofile.core.model.empty
 import dev.forcecodes.gitprofile.core.qualifiers.IoDispatcher
 import dev.forcecodes.gitprofile.domain.source.DetailsRepository
 import dev.forcecodes.gitprofile.domain.usecase.BaseFlowUseCase
 import dev.forcecodes.gitprofile.domain.usecase.UseCaseParams
+import dev.forcecodes.gitprofile.domain.utils.numberFormatter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import org.json.JSONException
 import org.json.JSONObject
-import java.text.NumberFormat
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -25,38 +25,18 @@ class ObserveReposUseCase @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : BaseFlowUseCase<ObserveReposUseCase.Params, ReposViewState>(dispatcher) {
 
-    private val numberFormatter = NumberFormat.getNumberInstance()
-
     class Params(
         val name: String
     ) : UseCaseParams.Params()
 
     override fun execute(parameters: Params): Flow<ReposViewState> {
         return detailsRepository.getRepositories(parameters.name).map { result ->
-            when(result) {
-                is Result.Success -> {
-                    val data = result.data
+            result.foldable(
+                { ReposViewState(true, emptyList()) },
+                { entities ->
                     ReposViewState(
                         false,
-                        data.map { entity ->
-                            UserRepoUiModel(
-                                id = entity.id,
-                                name = entity.name,
-                                starred = formatStarredCount(entity.stargazersCount),
-                                description = entity.description,
-                                language = entity.language,
-                                color = getColor(entity.language)
-                            )
-                        }
-                    )
-                }
-                is Result.Error -> {
-                    ReposViewState(false, emptyList(), result.exception.message)
-                }
-                is Result.Loading -> {
-                    ReposViewState(
-                        true,
-                        result.data?.map { entity ->
+                        entities?.map { entity ->
                             UserRepoUiModel(
                                 id = entity.id,
                                 name = entity.name,
@@ -67,9 +47,9 @@ class ObserveReposUseCase @Inject constructor(
                             )
                         } ?: emptyList()
                     )
-                }
-            }
-
+                },
+                { exception -> ReposViewState(false, emptyList(), exception.message) }
+            )
         }.distinctUntilChanged()
     }
 

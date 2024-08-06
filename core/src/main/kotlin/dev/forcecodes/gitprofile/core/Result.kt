@@ -5,7 +5,6 @@ package dev.forcecodes.gitprofile.core
 import dev.forcecodes.gitprofile.core.Result.Error
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind

@@ -4,14 +4,12 @@ import dev.forcecodes.gitprofile.data.cache.entity.UserDetailsEntity
 import dev.forcecodes.gitprofile.core.Mapper
 import dev.forcecodes.gitprofile.core.model.DetailsUiModel
 import dev.forcecodes.gitprofile.core.model.empty
-import java.text.NumberFormat
+import dev.forcecodes.gitprofile.domain.utils.numberFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class DetailsUiMapper @Inject constructor() : Mapper<UserDetailsEntity?, DetailsUiModel?> {
-
-    private val numberFormatter = NumberFormat.getNumberInstance()
 
     override fun invoke(data: UserDetailsEntity?): DetailsUiModel? {
         return data?.run {

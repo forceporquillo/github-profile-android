@@ -1,11 +1,9 @@
 package dev.forcecodes.gitprofile.domain.source
 
 import dev.forcecodes.gitprofile.core.Result
-import dev.forcecodes.gitprofile.data.api.ApiResponse
 import dev.forcecodes.gitprofile.data.api.GithubRemoteDataSource
 import dev.forcecodes.gitprofile.data.cache.LocalUserDataSource
 import dev.forcecodes.gitprofile.data.cache.entity.UserEntity
-import dev.forcecodes.gitprofile.domain.mapper.UserDetailsEntityMapper
 import dev.forcecodes.gitprofile.domain.mapper.UserEntityMapper
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -20,49 +18,35 @@ interface UsersRepository {
 class UserRepositoryImpl @Inject constructor(
     private val userLocalDataSource: LocalUserDataSource,
     private val githubRemoteDataSource: GithubRemoteDataSource,
-    private val userEntityMapper: UserEntityMapper,
-    private val detailsEntityMapper: UserDetailsEntityMapper
+    private val userEntityMapper: UserEntityMapper
 ) : NetworkBoundResource(), UsersRepository {
 
     override fun refreshUser(page: Int): Flow<Result<List<UserEntity>>> {
         // always refresh from start and
         // consume it so it'll invoke a remote API request.
-        return loadFromResource(
-            remoteDataSource = {
-                githubRemoteDataSource.getUsers(page, MAX_SIZE)
+        return conflateResource(
+            cacheSource = { userLocalDataSource.getUserFlow() },
+            remoteSource = { githubRemoteDataSource.getUsers(page, MAX_SIZE) },
+            accumulator = { userLocalDataSource.saveUsers(userEntityMapper.invoke(it))},
+            shouldFetch = { cache ->
+                cache?.isEmpty() == true
             },
-            localDataSource = {
-                userLocalDataSource.saveUsers(userEntityMapper.invoke(it))
-            })
+            strategy = FailureStrategy.ThrowOnFailure,
+            fetchBehavior = FetchBehavior.FetchWithProgress
+        )
     }
 
     override fun loadMore(since: Int): Flow<Result<List<UserEntity>>> {
-        return loadFromResource(
-            remoteDataSource = {
-                githubRemoteDataSource.getUsers(since, DEFAULT_PAGE_SIZE)
-            },
-            localDataSource = {
-                userLocalDataSource.saveUsers(userEntityMapper.invoke(it))
-            })
-    }
-
-    private fun <T> loadFromResource(
-        invalidate: Boolean = true,
-        remoteDataSource: suspend () -> ApiResponse<T>,
-        localDataSource: suspend (T) -> Unit
-    ): Flow<Result<List<UserEntity>>> = conflateResource(
-        cacheSource = { userLocalDataSource.getUserFlow() },
-        remoteSource = { remoteDataSource() },
-        accumulator = { data -> localDataSource(data) },
-        shouldFetch = { cache ->
-            // fetch only when db cache is empty or we
-            // forcibly invoked to invalidate
-            cache?.isEmpty() == true || invalidate
-        }
-    )
-
-    companion object {
-        private const val DEFAULT_PAGE_SIZE = 30
-        private const val MAX_SIZE = 100
+        return conflateResource(
+            accumulator = { userLocalDataSource.saveUsers(userEntityMapper.invoke(it)) },
+            remoteSource = { githubRemoteDataSource.getUsers(since, DEFAULT_PAGE_SIZE) },
+            cacheSource = { userLocalDataSource.getUserFlow() },
+            shouldFetch = { cache ->
+                cache?.isEmpty() == true
+            }
+        )
     }
 }
+
+private const val DEFAULT_PAGE_SIZE = 30
+private const val MAX_SIZE = 100

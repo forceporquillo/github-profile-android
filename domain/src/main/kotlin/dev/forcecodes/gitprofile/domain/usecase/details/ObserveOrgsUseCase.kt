@@ -2,7 +2,6 @@ package dev.forcecodes.gitprofile.domain.usecase.details
 
 import dev.forcecodes.gitprofile.core.Result
 import dev.forcecodes.gitprofile.core.internal.Logger
-import dev.forcecodes.gitprofile.core.model.empty
 import dev.forcecodes.gitprofile.core.qualifiers.IoDispatcher
 import dev.forcecodes.gitprofile.core.successOr
 import dev.forcecodes.gitprofile.domain.source.DetailsRepository
@@ -12,11 +11,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import org.json.JSONException
-import org.json.JSONObject
-import java.text.NumberFormat
 import javax.inject.Inject
-import javax.inject.Named
 
 class ObserveOrgsUseCase @Inject constructor(
     private val detailsRepository: DetailsRepository,
@@ -30,13 +25,7 @@ class ObserveOrgsUseCase @Inject constructor(
     override fun execute(parameters: Params): Flow<List<OrgsUiModel>> {
         return detailsRepository.getOrganizations(parameters.name).map { result ->
             if (result is Result.Loading) {
-                result.data?.map { entity ->
-                    OrgsUiModel(
-                        id = entity.id,
-                        description = entity.description,
-                        name = entity.login
-                    )
-                } ?: emptyList()
+                emptyList()
             } else {
                 result.successOr(emptyList()).map { entity ->
                     OrgsUiModel(
