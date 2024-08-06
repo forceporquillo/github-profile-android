@@ -6,7 +6,9 @@ import dev.forcecodes.gitprofile.data.extensions.cancelWhenActive
 import dev.forcecodes.gitprofile.domain.usecase.details.DetailsViewState
 import dev.forcecodes.gitprofile.domain.usecase.details.GetUserDetailsUseCase
 import dev.forcecodes.android.gitprofile.ui.BaseViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -30,8 +32,15 @@ class DetailsViewModel @Inject constructor(
 
                 fetchDetailsJob?.cancelWhenActive()
 
-                fetchDetailsJob = collectNewState(id, name) {
-                    val newState = oldState.copy(isLoading, error, data)
+                fetchDetailsJob = collectNewState(id, name) {details ->
+                    if (details.error != null) {
+                        delay(1250L)
+                    }
+                    val newState = oldState.copy(
+                        details.isLoading,
+                        details.error,
+                        details.data
+                    )
                     setSideEffects(newState)
                     setState(newState)
                 }
@@ -45,7 +54,7 @@ class DetailsViewModel @Inject constructor(
         _finishWhenError.value = errorMessage
     }
 
-    private fun collectNewState(id: Int, name: String, state: DetailsViewState.() -> Unit) =
+    private fun collectNewState(id: Int, name: String, state: suspend (DetailsViewState) -> Unit) =
         viewModelScope.launch {
             getUserDetailsUseCase
                 .invoke(GetUserDetailsUseCase.Params(id, name))

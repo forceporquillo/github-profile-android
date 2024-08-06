@@ -11,8 +11,10 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import dev.forcecodes.android.gitprofile.binding.viewBinding
 import dev.forcecodes.android.gitprofile.databinding.ActivityDetailsBinding
+import dev.forcecodes.android.gitprofile.extensions.repeatOnLifecycle
 import dev.forcecodes.android.gitprofile.extensions.updateForTheme
 import dev.forcecodes.android.gitprofile.theme.ThemeViewModel
+import dev.forcecodes.gitprofile.domain.usecase.details.DetailsViewState
 import kotlinx.coroutines.launch
 
 /**
@@ -37,8 +39,14 @@ class DetailsActivity : AppCompatActivity() {
         binding.viewmodel = viewModel
 
         viewModel.getDetails(userExtras)
-        subViewModel.sendEvent(LoadUiActions.LoadAll(userExtras.second))
 
+        repeatOnLifecycle {
+            viewModel.state.collect {
+                if (it.data != null) {
+                    subViewModel.sendEvent(LoadUiActions.LoadAll(userExtras.second))
+                }
+            }
+        }
 //        binding.appbar.doOnApplyWindowInsets { view, windowInsetsCompat, viewPaddingState ->
 //            val paddingTop = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.statusBars())
 //            binding.appbar.updatePadding(top = paddingTop.top + viewPaddingState.top)
