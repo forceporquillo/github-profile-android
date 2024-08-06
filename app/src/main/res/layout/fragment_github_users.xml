@@ -69,7 +69,7 @@
             android:id="@+id/search_bar"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:hint="Search profile (e.g., strongforce1)" />
+            android:hint="@string/search_profile_e_g_strongforce1" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -78,6 +78,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:backgroundTint="?colorSurface"
+        app:animateNavigationIcon="true"
         android:hint="Search profile"
         app:layout_anchor="@id/search_bar">
 
@@ -89,6 +90,16 @@
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/users_item_layout"/>
+
+        <TextView
+            android:id="@+id/search_error_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textColor="?attr/colorPrimary"
+            android:text="@string/paging_error_message"
+            android:visibility="gone"/>
 
     </com.google.android.material.search.SearchView>
 

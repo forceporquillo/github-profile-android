@@ -17,6 +17,8 @@ import dev.forcecodes.gitprofile.domain.usecase.users.ObserveGithubUsersInteract
 import dev.forcecodes.gitprofile.domain.usecase.users.SearchUserUseCase
 import dev.forcecodes.android.gitprofile.extensions.launchAndCollect
 import dev.forcecodes.android.gitprofile.util.notNull
+import dev.forcecodes.gitprofile.core.Result
+import dev.forcecodes.gitprofile.core.error
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -56,6 +58,9 @@ class GithubUserViewModel @Inject constructor(
         loadMoreUsersUseCase.invoke(params)
     }
 
+    private val _showSearchErrorMessage = MutableStateFlow(false)
+    val showSearchErrorMessage: StateFlow<Boolean> = _showSearchErrorMessage.asStateFlow()
+
     private val _userSearchResults = MutableStateFlow<List<UserUiModel>>(emptyList())
     val userSearchResults: StateFlow<List<UserUiModel>> = _userSearchResults.asStateFlow()
 
@@ -83,7 +88,11 @@ class GithubUserViewModel @Inject constructor(
         val params = SearchUserUseCase.SearchParams(query.toString())
         searchUserUseCase.invoke(params)
     }) { uiResult ->
-        _userSearchResults.value = uiResult.successOr(emptyList())
+        when (uiResult) {
+            is Result.Success -> _userSearchResults.value = uiResult.successOr(emptyList())
+            is Result.Error -> _showSearchErrorMessage.value = true
+            is Result.Loading -> {}
+        }
     }
 
     private fun setPagingSideEffect(uiState: ListItemUiState) {
@@ -107,6 +116,7 @@ class GithubUserViewModel @Inject constructor(
     }
 
     fun searchUser(query: CharSequence) {
+        hideSearchErrorMessage()
         if (query.isEmpty()) {
             return
         }
@@ -116,7 +126,12 @@ class GithubUserViewModel @Inject constructor(
     }
 
     fun clearSelections() {
+        hideSearchErrorMessage()
         _userSearchResults.value = emptyList()
+    }
+
+    private fun hideSearchErrorMessage() {
+        _showSearchErrorMessage.value = false
     }
 
     companion object {
@@ -124,7 +139,6 @@ class GithubUserViewModel @Inject constructor(
             pageSize = 30, initialLoadSize = 60
         )
         private const val INITIAL_PAGE_INDEX = 0
-        private const val TIME_OUT_MILLIS = 1000L
     }
 }
 

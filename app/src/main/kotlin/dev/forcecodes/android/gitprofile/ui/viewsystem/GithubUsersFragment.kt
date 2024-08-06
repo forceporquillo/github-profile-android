@@ -2,6 +2,7 @@ package dev.forcecodes.android.gitprofile.ui.viewsystem
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -81,6 +82,12 @@ class GithubUsersFragment : Fragment(R.layout.fragment_github_users) {
             launch {
                 viewModel.userSearchResults.collect {
                     filteredSearchAdapter.submitList(it)
+                }
+            }
+
+            launch {
+                viewModel.showSearchErrorMessage.collect { showError ->
+                    binding.searchErrorText.isVisible = showError
                 }
             }
         }
