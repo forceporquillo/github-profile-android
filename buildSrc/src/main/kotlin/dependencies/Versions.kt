@@ -8,7 +8,7 @@ object Versions {
     const val core_ktx = "1.13.1"
     const val navigation = "2.7.7"
     const val navigation_hilt = "1.2.0"
-    const val app_compat = "1.5.1"
+    const val app_compat = "1.7.0"
     const val material = "1.12.0"
     const val lifecycle = "2.8.4"
     const val fragment_ktx = "1.8.2"
