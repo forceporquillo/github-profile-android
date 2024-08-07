@@ -1,5 +1,6 @@
 package dev.forcecodes.android.gitprofile.ui.viewsystem
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
@@ -34,6 +35,7 @@ class GithubUsersFragment : Fragment(R.layout.fragment_github_users) {
         startActivity(DetailsActivity.createIntent(requireContext(), info))
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -54,16 +56,31 @@ class GithubUsersFragment : Fragment(R.layout.fragment_github_users) {
 
         val filteredSearchAdapter = FilteredSearchAdapter(onClickListener)
 
-        binding.filteredSearchList.adapter = filteredSearchAdapter
-
-        binding.searchView
-            .editText
-            .doOnTextChanged {
-                viewModel.clearSelections()
+        with(binding) {
+            recyclerView.adapter = pagedAdapter.withLoadStateAdapter(loadStateAdapter) {
+                activityViewModel.sendEvent(GithubUserUiEvent.OnLoad(1))
             }
-            .onEach { query ->
-                viewModel.searchUser(query)
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+            filteredSearchList.adapter = filteredSearchAdapter
+
+            searchView.apply {
+                // do not consume inset inside SearchView#setUpStatusBarSpacerInsetListener
+                setStatusBarSpacerEnabled(false)
+                editText
+                    .doOnTextChanged {
+                        viewModel.clearSelections()
+                    }
+                    .onEach { query ->
+                        viewModel.searchUser(query)
+                    }.launchIn(viewLifecycleOwner.lifecycleScope)
+            }
+
+            swipeRefresh.setOnRefreshListener {
+                pagedAdapter.refresh()
+                val snapshotSize = pagedAdapter.snapshot().size
+                activityViewModel.onRefresh(snapshotSize)
+            }
+        }
 
         launchWithViewLifecycleScope {
             launch {
@@ -90,12 +107,6 @@ class GithubUsersFragment : Fragment(R.layout.fragment_github_users) {
                     binding.searchErrorText.isVisible = showError
                 }
             }
-        }
-
-        binding.swipeRefresh.setOnRefreshListener {
-            pagedAdapter.refresh()
-            val snapshotSize = pagedAdapter.snapshot().size
-            activityViewModel.onRefresh(snapshotSize)
         }
     }
 

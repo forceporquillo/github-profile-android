@@ -4,5 +4,5 @@ import dev.forcecodes.gitprofile.core.UiEvent
 
 sealed class LoadUiActions : UiEvent {
     data class LoadAll(val name: String) : LoadUiActions()
-    object Refresh : LoadUiActions()
+    data object Refresh : LoadUiActions()
 }

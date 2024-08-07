@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.*
@@ -29,7 +30,7 @@ class DetailsActivity : AppCompatActivity() {
     private val themeViewModel by viewModels<ThemeViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-       // WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)

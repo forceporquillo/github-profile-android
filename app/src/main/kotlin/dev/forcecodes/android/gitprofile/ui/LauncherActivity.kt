@@ -1,5 +1,7 @@
 package dev.forcecodes.android.gitprofile.ui
 
+import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -38,10 +40,15 @@ class LauncherActivity : AppCompatActivity() {
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun navigateToMainActivity() {
         val theme = themeViewModel.currentTheme
         startActivity(newThemedIntent(theme, MainActivity::class))
-        overridePendingTransition(0, 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(Activity.OVERRIDE_TRANSITION_OPEN, 0, 0)
+        } else {
+            overridePendingTransition(0, 0)
+        }
         finish()
     }
 }

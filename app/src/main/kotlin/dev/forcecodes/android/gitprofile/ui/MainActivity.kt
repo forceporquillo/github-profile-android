@@ -2,9 +2,13 @@ package dev.forcecodes.android.gitprofile.ui
 
 import android.content.res.Configuration
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -29,30 +33,33 @@ class MainActivity : AppCompatActivity() {
 
     private val themeViewModel: ThemeViewModel by viewModels()
 
-    @OptIn(FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge()
 
         super.onCreate(savedInstanceState)
 
         currentTheme?.let {
-            if (themeViewModel.currentTheme == it) {
+            if (savedInstanceState == null) {
                 updateForTheme(it)
+            } else {
+                if (themeViewModel.currentTheme == it) {
+                    updateForTheme(it)
+                }
             }
         }
 
         setContentView(binding.root)
 
-        binding.lifecycleOwner = this
-        binding.viewmodel = viewModel
-
-        binding.toolbar.doOnApplyWindowInsets { view, windowInsetsCompat, viewPaddingState ->
-            view.updatePadding(
-                top = viewPaddingState.top + windowInsetsCompat.systemWindowInsetTop
-            )
+        binding.root.doOnApplyWindowInsets { view, windowInsetsCompat, paddingState ->
+            view.doOnLayout {
+                val systemBars = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.systemBars())
+                view.updatePadding(top = systemBars.top + paddingState.top)
+            }
         }
 
-        binding.toolbar
+        binding.lifecycleOwner = this
+        binding.viewmodel = viewModel
 
         repeatOnLifecycle {
             themeViewModel.theme

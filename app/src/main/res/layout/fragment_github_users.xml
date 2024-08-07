@@ -67,6 +67,7 @@
             android:layout_marginEnd="@dimen/spacing_normal"
             app:defaultMarginsEnabled="false"
             android:id="@+id/search_bar"
+            app:backgroundTint="?attr/colorSurface"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:hint="@string/search_profile_e_g_strongforce1" />
@@ -79,7 +80,7 @@
         android:layout_height="match_parent"
         app:backgroundTint="?colorSurface"
         app:animateNavigationIcon="true"
-        android:hint="Search profile"
+        android:hint="@string/search_profile"
         app:layout_anchor="@id/search_bar">
 
         <androidx.recyclerview.widget.RecyclerView
