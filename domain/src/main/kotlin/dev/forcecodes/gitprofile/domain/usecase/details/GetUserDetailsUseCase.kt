@@ -6,7 +6,6 @@ import dev.forcecodes.gitprofile.core.internal.Logger
 import dev.forcecodes.gitprofile.core.model.DetailsUiModel
 import dev.forcecodes.gitprofile.core.qualifiers.IoDispatcher
 import dev.forcecodes.gitprofile.domain.mapper.DetailsUiMapper
-import dev.forcecodes.gitprofile.domain.source.BasicInfo
 import dev.forcecodes.gitprofile.domain.source.DetailsRepository
 import dev.forcecodes.gitprofile.domain.usecase.BaseFlowUseCase
 import dev.forcecodes.gitprofile.domain.usecase.UseCaseParams
@@ -26,33 +25,32 @@ class GetUserDetailsUseCase @Inject constructor(
     class Params(val id: Int, val name: String) : UseCaseParams.Params()
 
     override fun execute(parameters: Params): Flow<DetailsViewState> {
-        return detailsRepository.getUserDetails(
-            BasicInfo(parameters.id, parameters.name)
-        ).map { result ->
-            result.foldable(
-                {
-                    DetailsViewState(
-                        data = null,
-                        isLoading = true,
-                        error = null
-                    )
-                },
-                { entity ->
-                    DetailsViewState(
-                        data = detailsUiMapper.invoke(entity),
-                        isLoading = false,
-                        error = null
-                    )
-                },
-                { exception ->
-                    Logger.e("Error: $exception")
-                    DetailsViewState(
-                        data = null,
-                        isLoading = false,
-                        error = exception.message
-                    )
-                }
-            )
+        return detailsRepository.getUserDetails(parameters.id, parameters.name)
+            .map { result ->
+                result.foldable(
+                    {
+                        DetailsViewState(
+                            data = null,
+                            isLoading = true,
+                            error = null
+                        )
+                    },
+                    { entity ->
+                        DetailsViewState(
+                            data = detailsUiMapper.invoke(entity),
+                            isLoading = false,
+                            error = null
+                        )
+                    },
+                    { exception ->
+                        Logger.e("Error: $exception")
+                        DetailsViewState(
+                            data = null,
+                            isLoading = false,
+                            error = exception.message
+                        )
+                    }
+                )
         }
     }
 
