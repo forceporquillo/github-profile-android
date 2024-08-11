@@ -8,6 +8,7 @@ import dev.forcecodes.gitprofile.data.api.models.StarredReposEntity
 import dev.forcecodes.gitprofile.data.cache.LocalUserDataSource
 import dev.forcecodes.gitprofile.data.cache.entity.OrganizationsEntity
 import dev.forcecodes.gitprofile.data.cache.entity.UserDetailsEntity
+import dev.forcecodes.gitprofile.domain.DataStrategy
 import dev.forcecodes.gitprofile.domain.mapper.OrganizationEntityMapper
 import dev.forcecodes.gitprofile.domain.mapper.StarredReposEntityMapper
 import dev.forcecodes.gitprofile.domain.mapper.UserDetailsEntityMapper
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 interface DetailsRepository {
     fun searchUser(name: String): Flow<Result<List<UserDetailsEntity>>>
-    fun getUserDetails(id: Int, name: String): Flow<Result<UserDetailsEntity>>
+    fun getUserDetails(id: Int, name: String, strategy: DataStrategy = DataStrategy.CacheOverRemote): Flow<Result<UserDetailsEntity>>
     fun getRepositories(name: String): Flow<Result<List<RepositoryEntity>>>
     fun getStarredRepositories(name: String): Flow<Result<List<StarredReposEntity>>>
     fun getOrganizations(name: String): Flow<Result<List<OrganizationsEntity>>>
@@ -24,19 +25,25 @@ interface DetailsRepository {
 
 class DetailsRepositoryImpl @Inject constructor(
     private val organizationEntityMapper: OrganizationEntityMapper,
-    private val starredReposEntity: StarredReposEntityMapper,
+    private val starredReposEntityMapper: StarredReposEntityMapper,
     private val userLocalDataSource: LocalUserDataSource,
     private val githubRemoteDataSource: GithubRemoteDataSource,
     private val entityMapper: UserDetailsEntityMapper,
     private val indexManager: KeyedPagedIndexManager
 ) : NetworkBoundResource(), DetailsRepository {
 
-    override fun getUserDetails(id: Int, name: String): Flow<Result<UserDetailsEntity>> {
+    override fun getUserDetails(id: Int, name: String, strategy: DataStrategy): Flow<Result<UserDetailsEntity>> {
         return conflateResource(
             cacheSource = { userLocalDataSource.getUserDetailsFlow(id) },
             remoteSource = { githubRemoteDataSource.getDetails(name) },
             accumulator = { data -> userLocalDataSource.saveUserDetails(entityMapper.invoke(data)) },
-            shouldFetch = { cache -> cache == null },
+            shouldFetch = { cache ->
+                if (strategy is DataStrategy.RemoteOverCache) {
+                    true
+                } else {
+                    cache == null
+                }
+            },
             strategy = FailureStrategy.ThrowOnFailure
         )
     }
@@ -72,7 +79,7 @@ class DetailsRepositoryImpl @Inject constructor(
             remoteSource = { page -> githubRemoteDataSource.getStarredRepositories(name, page, MAX_FETCH_SIZE) },
             saveFetchResult = { starredRepos ->
                 val mappedStarredRepos = starredRepos.map { repo ->
-                    starredReposEntity.invoke(repo, name)
+                    starredReposEntityMapper.invoke(repo, name)
                 }
                 userLocalDataSource.saveStarredRepositores(mappedStarredRepos)
             }

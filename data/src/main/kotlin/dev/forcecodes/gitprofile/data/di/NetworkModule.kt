@@ -73,7 +73,7 @@ object NetworkModule {
     @InternalApi
     @Provides
     internal fun providesOkHttpLoggingInterceptor(): HttpLoggingInterceptor {
-        return HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
+        return HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.HEADERS }
     }
 
     @InternalApi

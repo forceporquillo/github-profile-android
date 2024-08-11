@@ -8,11 +8,7 @@ import dev.forcecodes.gitprofile.data.api.EmptyResponseException
 import dev.forcecodes.gitprofile.data.api.onEmpty
 import dev.forcecodes.gitprofile.data.api.onError
 import dev.forcecodes.gitprofile.data.api.onSuccess
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 
 typealias RemoteNetworkCall<Remote> = suspend () -> ApiResponse<Remote>
 typealias LocalDatabaseCache<Cache> = suspend () -> Flow<Cache>

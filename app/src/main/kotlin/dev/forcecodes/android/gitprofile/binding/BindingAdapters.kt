@@ -12,8 +12,8 @@ import com.bumptech.glide.signature.ObjectKey
 import dev.forcecodes.android.gitprofile.util.BlurTransformation
 import dev.forcecodes.android.gitprofile.util.GlideApp
 import dev.forcecodes.android.gitprofile.util.toUserContentUri
-import dev.forcecodes.gitprofile.core.internal.Logger
 import dev.forcecodes.gitprofile.core.model.empty
+import dev.forcecodes.gitprofile.domain.usecase.details.DetailsViewState
 
 @BindingAdapter("loadImage")
 fun ImageView.loadImage(id: Int) {
@@ -28,7 +28,6 @@ fun ImageView.loadImage(id: Int) {
 
 @BindingAdapter("blurImage")
 fun ImageView.bindBlurImage(id: Int) {
-    Logger.i("Url: $id")
     GlideApp.with(context)
         .asBitmap()
         .signature(ObjectKey(id))
@@ -53,8 +52,17 @@ fun TextView.spannable(followers: String?, following: String?) {
 }
 
 @BindingAdapter("delayedVisibility")
-fun View.delayedVisibility(show: Boolean) {
-    postOnAnimationDelayed(500L) {
-        visibility = if (show) View.VISIBLE else View.GONE
+fun View.delayedVisibility(viewState: DetailsViewState) {
+    if (!viewState.isForceRefresh) {
+        postOnAnimationDelayed(500L) {
+            visibility = if (viewState.isLoading) View.VISIBLE else View.GONE
+        }
+    }
+}
+
+@BindingAdapter("profileView")
+fun ImageView.profileView(viewState: DetailsViewState) {
+    if (!viewState.isForceRefresh) {
+        viewState.data?.id?.let { loadImage(it) }
     }
 }

@@ -6,9 +6,8 @@ import dev.forcecodes.gitprofile.data.extensions.cancelWhenActive
 import dev.forcecodes.gitprofile.domain.usecase.details.DetailsViewState
 import dev.forcecodes.gitprofile.domain.usecase.details.GetUserDetailsUseCase
 import dev.forcecodes.android.gitprofile.ui.BaseViewModel
-import kotlinx.coroutines.CoroutineScope
+import dev.forcecodes.gitprofile.domain.DataStrategy
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -24,26 +23,24 @@ class DetailsViewModel @Inject constructor(
     private val _finishWhenError = MutableStateFlow<String?>(null)
     val finishWhenError: StateFlow<String?> = _finishWhenError
 
+    private var userExtras: Pair<Int, String> = Pair(0, "")
+
     override fun stateReducer(oldState: DetailsViewState, event: DetailsUiEvent) {
-        when (event) {
-            is DetailsUiEvent.GetData -> {
-                val id = event.pair.first
-                val name = event.pair.second
-
-                fetchDetailsJob?.cancelWhenActive()
-
-                fetchDetailsJob = collectNewState(id, name) {details ->
-                    if (details.error != null) {
-                        delay(1250L)
-                    }
-                    val newState = oldState.copy(
-                        details.isLoading,
-                        details.error,
-                        details.data
-                    )
-                    setSideEffects(newState)
-                    setState(newState)
-                }
+        if (event is DetailsUiEvent.GetData || event is DetailsUiEvent.Refresh) {
+            fetchDetailsJob?.cancelWhenActive()
+            fetchDetailsJob = collectNewState(
+                id = event.data.first,
+                name = event.data.second,
+                strategy = event.strategy
+            ) {
+                val newState = oldState.copy(
+                    isLoading = it.isLoading,
+                    data = it.data,
+                    error = it.error,
+                    isForceRefresh = it.isForceRefresh
+                )
+                setSideEffects(newState)
+                setState(newState)
             }
         }
     }
@@ -54,15 +51,21 @@ class DetailsViewModel @Inject constructor(
         _finishWhenError.value = errorMessage
     }
 
-    private fun collectNewState(id: Int, name: String, state: suspend (DetailsViewState) -> Unit) =
+    private fun collectNewState(id: Int, name: String, strategy: DataStrategy,
+                                state: suspend (DetailsViewState) -> Unit) =
         viewModelScope.launch {
             getUserDetailsUseCase
-                .invoke(GetUserDetailsUseCase.Params(id, name))
+                .invoke(GetUserDetailsUseCase.Params(id, name, strategy))
                 .collect(state::invoke)
         }
 
     fun getDetails(pair: Pair<Int, String>) {
-        sendEvent(DetailsUiEvent.GetData(pair))
+        userExtras = pair
+        sendEvent(DetailsUiEvent.GetData(userExtras))
+    }
+
+    fun refresh() {
+        sendEvent(DetailsUiEvent.Refresh(userExtras))
     }
 
     override fun onCleared() {

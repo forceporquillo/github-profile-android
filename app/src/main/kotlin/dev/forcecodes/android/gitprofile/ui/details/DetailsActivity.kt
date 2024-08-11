@@ -9,9 +9,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.*
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.appbar.AppBarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import dev.forcecodes.android.gitprofile.binding.viewBinding
 import dev.forcecodes.android.gitprofile.databinding.ActivityDetailsBinding
+import dev.forcecodes.android.gitprofile.extensions.doOnApplyWindowInsets
 import dev.forcecodes.android.gitprofile.extensions.repeatOnLifecycle
 import dev.forcecodes.android.gitprofile.extensions.updateForTheme
 import dev.forcecodes.android.gitprofile.theme.ThemeViewModel
@@ -42,16 +44,28 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.getDetails(userExtras)
 
         repeatOnLifecycle {
-            viewModel.state.collect {
-                if (it.data != null) {
+            viewModel.state.collect { uiState ->
+                if (uiState.data != null) {
                     subViewModel.sendEvent(LoadUiActions.LoadAll(userExtras.second))
+                }
+                if (uiState.isForceRefresh) {
+                    binding.swipeRefreshLayout.isRefreshing = uiState.data == null
                 }
             }
         }
-//        binding.appbar.doOnApplyWindowInsets { view, windowInsetsCompat, viewPaddingState ->
-//            val paddingTop = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.statusBars())
-//            binding.appbar.updatePadding(top = paddingTop.top + viewPaddingState.top)
-//        }
+
+        binding.root.doOnApplyWindowInsets { view, windowInsetsCompat, viewPaddingState ->
+            val systemBar =  windowInsetsCompat.getInsets(WindowInsetsCompat.Type.statusBars())
+            view.updatePadding(top = systemBar.top + viewPaddingState.top)
+        }
+
+        binding.appbar.addOnOffsetChangedListener { _, verticalOffset ->
+           binding.swipeRefreshLayout.isEnabled = verticalOffset == 0
+        }
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.refresh()
+        }
 
         lifecycleScope.launch {
             viewModel.finishWhenError.collect { error ->
