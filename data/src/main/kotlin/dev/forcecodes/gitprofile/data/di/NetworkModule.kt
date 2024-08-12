@@ -13,16 +13,16 @@ import dev.forcecodes.gitprofile.data.BuildConfig
 import dev.forcecodes.gitprofile.data.api.ConnectivityInterceptor
 import dev.forcecodes.gitprofile.data.api.GithubApiService
 import dev.forcecodes.gitprofile.data.api.NetworkStatusProvider
+import dev.forcecodes.gitprofile.data.api.interceptors.CacheInterceptor
+import dev.forcecodes.gitprofile.data.api.interceptors.HeaderInterceptor
+import dev.forcecodes.gitprofile.data.api.interceptors.NextPageInterceptor
 import dev.forcecodes.gitprofile.data.extensions.checkMainThread
-import dev.forcecodes.gitprofile.data.extensions.containsNextPage
 import dev.forcecodes.gitprofile.data.extensions.delegatingCallFactory
 import dev.forcecodes.gitprofile.data.internal.GithubApi
 import dev.forcecodes.gitprofile.data.internal.InternalApi
 import dev.forcecodes.gitprofile.data.utils.ResponseNextPageLookup
 import okhttp3.Cache
 import okhttp3.CacheControl
-import okhttp3.Credentials
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -40,11 +40,6 @@ object NetworkModule {
     private const val API_VERSION_HEADER        = "application/vnd.github.v3+json"
     private const val BASE_URL                  = "https://api.github.com"
 
-    private val credentialsOrNull: String? get() =
-        if (BuildConfig.TOKEN.isNotEmpty() || BuildConfig.USERNAME.isNotEmpty()) {
-            Credentials.basic(BuildConfig.USERNAME, BuildConfig.TOKEN)
-        } else null
-
     @InternalApi
     @Provides
     internal fun providesMoshi(): Moshi {
@@ -53,9 +48,9 @@ object NetworkModule {
 
     @InternalApi
     @Provides
-    internal fun provideConnectivityInterceptor(@InternalApi networkStatusProvider: NetworkStatusProvider): ConnectivityInterceptor {
-        return ConnectivityInterceptor(networkStatusProvider)
-    }
+    internal fun provideConnectivityInterceptor(
+        @InternalApi networkStatusProvider: NetworkStatusProvider
+    ): ConnectivityInterceptor = ConnectivityInterceptor(networkStatusProvider)
 
     @InternalApi
     @Provides
@@ -82,7 +77,9 @@ object NetworkModule {
     @WorkerThread
     internal fun providesOkHttpClient(
         @InternalApi cache: Cache,
-        @InternalApi cacheInterceptor: Interceptor,
+        @InternalApi nextPageInterceptor: NextPageInterceptor,
+        @InternalApi cacheInterceptor: CacheInterceptor,
+        @InternalApi headerInterceptor: HeaderInterceptor,
         @InternalApi httpLoggingInterceptor: HttpLoggingInterceptor,
         @InternalApi connectivityInterceptor: ConnectivityInterceptor
     ): OkHttpClient = checkMainThread {
@@ -98,20 +95,9 @@ object NetworkModule {
                 addInterceptor(httpLoggingInterceptor)
             }
 
+            addInterceptor(nextPageInterceptor)
             addInterceptor(connectivityInterceptor)
-
-            addInterceptor(Interceptor { chain ->
-                val builder = chain.request().newBuilder()
-                    .addHeader("Accept", API_VERSION_HEADER)
-                    .addHeader("User-Agent", USER_AGENT)
-                // [Optional] add token here
-                credentialsOrNull?.let { credentials ->
-                    builder.addHeader("Authorization", credentials)
-                }
-
-                val request = builder.build()
-                chain.proceed(request)
-            })
+            addInterceptor(headerInterceptor)
 
         }.build()
     }
@@ -125,25 +111,22 @@ object NetworkModule {
     @InternalApi
     @Singleton
     @Provides
-    fun providesCacheInterceptor(
-        @InternalApi responseNextPageLookup: ResponseNextPageLookup,
+    internal fun providesNextPageInterceptor(
+        @InternalApi nextPageLookup: ResponseNextPageLookup
+    ): NextPageInterceptor = NextPageInterceptor(nextPageLookup)
+
+    @InternalApi
+    @Singleton
+    @Provides
+    internal fun providesCacheInterceptor(
         @InternalApi cacheControl: CacheControl
-    ): Interceptor {
-        return Interceptor { chain ->
-            val response = chain.proceed(chain.request())
+    ): CacheInterceptor = CacheInterceptor(cacheControl)
 
-            if (response.containsNextPage) {
-                responseNextPageLookup.nextIndexFromHeader(response.headers)
-            }
-
-            // cache
-            response.newBuilder()
-                .removeHeader("Pragma")
-                .removeHeader("Cache-Control")
-                .header("Cache-Control", cacheControl.toString())
-                .build()
-        }
-    }
+    @InternalApi
+    @Singleton
+    @Provides
+    internal fun providesHeaderInterceptor(): HeaderInterceptor =
+        HeaderInterceptor(API_VERSION_HEADER)
 
     @Provides
     @InternalApi
@@ -162,8 +145,3 @@ object NetworkModule {
         @InternalApi retrofit: Retrofit
     ): GithubApiService = retrofit.create()
 }
-
-
-// hardcoded for the meantime
-private const val APP_NAME = "dev.forcecodes.android.githubprofile"
-private val USER_AGENT by lazy { "developer: ${BuildConfig.USERNAME} app-name: $APP_NAME" }
