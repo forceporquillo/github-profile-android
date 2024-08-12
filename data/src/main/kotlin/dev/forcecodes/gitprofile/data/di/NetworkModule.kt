@@ -10,7 +10,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.forcecodes.gitprofile.data.BuildConfig
-import dev.forcecodes.gitprofile.data.api.ConnectivityInterceptor
+import dev.forcecodes.gitprofile.data.api.interceptors.ConnectivityInterceptor
 import dev.forcecodes.gitprofile.data.api.GithubApiService
 import dev.forcecodes.gitprofile.data.api.NetworkStatusProvider
 import dev.forcecodes.gitprofile.data.api.interceptors.CacheInterceptor
