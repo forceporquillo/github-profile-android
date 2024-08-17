@@ -41,9 +41,7 @@ class UserRepositoryImpl @Inject constructor(
             accumulator = { userLocalDataSource.saveUsers(userEntityMapper.invoke(it)) },
             remoteSource = { githubRemoteDataSource.getUsers(since, DEFAULT_PAGE_SIZE) },
             cacheSource = { userLocalDataSource.getUserFlow() },
-            shouldFetch = { cache ->
-                cache?.isEmpty() == true
-            }
+            shouldFetch = { /* always fetch from remote */ true }
         )
     }
 }
