@@ -4,13 +4,14 @@ import dev.forcecodes.gitprofile.core.Result
 import dev.forcecodes.gitprofile.data.api.GithubRemoteDataSource
 import dev.forcecodes.gitprofile.data.cache.LocalUserDataSource
 import dev.forcecodes.gitprofile.data.cache.entity.UserEntity
+import dev.forcecodes.gitprofile.domain.DataStrategy
 import dev.forcecodes.gitprofile.domain.mapper.UserEntityMapper
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 interface UsersRepository {
-    fun refreshUser(page: Int): Flow<Result<List<UserEntity>>>
+    fun refreshUser(page: Int, dataStrategy: DataStrategy): Flow<Result<List<UserEntity>>>
     fun loadMore(since: Int): Flow<Result<List<UserEntity>>>
 }
 
@@ -21,7 +22,7 @@ class UserRepositoryImpl @Inject constructor(
     private val userEntityMapper: UserEntityMapper
 ) : NetworkBoundResource(), UsersRepository {
 
-    override fun refreshUser(page: Int): Flow<Result<List<UserEntity>>> {
+    override fun refreshUser(page: Int, dataStrategy: DataStrategy): Flow<Result<List<UserEntity>>> {
         // always refresh from start and
         // consume it so it'll invoke a remote API request.
         return conflateResource(
@@ -29,7 +30,11 @@ class UserRepositoryImpl @Inject constructor(
             remoteSource = { githubRemoteDataSource.getUsers(page, MAX_SIZE) },
             accumulator = { userLocalDataSource.saveUsers(userEntityMapper.invoke(it))},
             shouldFetch = { cache ->
-                cache?.isEmpty() == true
+                if (dataStrategy is DataStrategy.CacheOverRemote) {
+                    cache?.isEmpty() == true
+                } else {
+                    true
+                }
             },
             strategy = FailureStrategy.ThrowOnFailure,
             fetchBehavior = FetchBehavior.FetchWithProgress

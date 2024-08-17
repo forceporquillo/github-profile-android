@@ -3,6 +3,7 @@ package dev.forcecodes.gitprofile.domain.usecase.users
 import dev.forcecodes.gitprofile.core.Result
 import dev.forcecodes.gitprofile.core.qualifiers.IoDispatcher
 import dev.forcecodes.gitprofile.data.cache.entity.UserEntity
+import dev.forcecodes.gitprofile.domain.DataStrategy
 import dev.forcecodes.gitprofile.domain.source.UsersRepository
 import dev.forcecodes.gitprofile.domain.usecase.UseCaseParams
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,7 +20,6 @@ class RefreshUsersUseCase @Inject constructor(
     class Params(val page: Int) : UseCaseParams.Params()
 
     override fun fromSource(params: Params): Flow<Result<List<UserEntity>>> {
-        // loads 100 github users per page refresh request
-        return usersRepository.refreshUser(params.page)
+        return usersRepository.refreshUser(params.page, DataStrategy.CacheOverRemote)
     }
 }
