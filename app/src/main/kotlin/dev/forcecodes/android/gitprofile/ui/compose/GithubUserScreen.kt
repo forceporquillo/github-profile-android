@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -94,9 +95,9 @@ fun GithubUserListScreen(
 
     val userList = usersViewModel.pagingFlow.collectAsLazyPagingItems()
     val refreshState = activityViewModel.refreshState.collectAsState()
-    var pageIndex by remember { mutableStateOf(0) }
+    var pageIndex by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(key1 = pageIndex) {
+    LaunchedEffect(pageIndex) {
         Logger.e("load more $pageIndex")
         usersViewModel.onLoadMore(pageIndex)
     }
@@ -105,53 +106,42 @@ fun GithubUserListScreen(
         contentPadding = PaddingValues(top = dimensionResource(id = R.dimen.spacing_small_2)),
         verticalArrangement = Arrangement.Top
     ) {
-//        itemsIndexed(
-//            userList,
-//            key = { index, userUidModel ->
-//                (userUidModel as UserUiModel.User).id
-//            },
-//            contentType = {
-//
-//            },
-//            itemContent = {
-//                index, userUiModel ->
-//                GithubUser(userUiModel as? UserUiModel.User, onClick)
-//            }
-//        ) { index, userUiModel ->
-//            GithubUser(userUiModel as? UserUiModel.User, onClick)
-//            if (index == userList.itemSnapshotList.lastIndex) {
-//                pageIndex = index
-//            }
-//        }
-
-//        pagingLoadStateItem(
-//            loadState = userList.loadState.source.append,
-//            keySuffix = "append",
-//            onError = {
-//                LoadStateFooter()
-//                // invalidate
-//                userList.refresh()
-//            }
-//        )
+        items(userList.itemCount) { index ->
+            userList[index]?.let { user ->
+                GithubUser(user as? UserUiModel.User, onClick)
+            }
+        }
+        pagingLoadStateItem(
+            loadState = userList.loadState.source.append,
+            keySuffix = "append",
+            onRequestMore = {
+               pageIndex = userList.itemCount
+            }
+        )
     }
-//    SwipeRefresh(
-//        modifier = Modifier.fillMaxSize(),
-//        state = rememberSwipeRefreshState(isRefreshing = refreshState.value),
-//        onRefresh = { }
-//    ) { }
-
 }
 
 // disable to prevent recomposition
 fun LazyListScope.pagingLoadStateItem(
     loadState: LoadState,
     keySuffix: String? = null,
-    onError: (@Composable LazyItemScope.(LoadState.NotLoading) -> Unit)? = null,
+    onRequestMore: (@Composable LazyItemScope.(LoadState.NotLoading) -> Unit)? = null
 ) {
-    if (onError != null && loadState is LoadState.NotLoading && loadState.endOfPaginationReached) {
+    if (onRequestMore != null && loadState is LoadState.NotLoading && loadState.endOfPaginationReached) {
         item(
             key = keySuffix?.let { "footer" },
-            content = { onError(loadState) },
+            content = {
+                onRequestMore(loadState)
+            },
+        )
+    }
+    if (loadState is LoadState.Loading) {
+        Logger.e("loading")
+        item(
+            key = keySuffix?.let { "footer" },
+            content = {
+                LoadStateFooterScreen()
+            }
         )
     }
 }
