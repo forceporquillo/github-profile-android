@@ -1,4 +1,4 @@
-<h1 align="center">Github Profile</h1>
+<h1 align="center">GitHub Profile</h1>
 <h4 align="center">Unofficial/Parody App</h4>
 :octocat: <strong>GitProfile</strong> is an Android application that allows users to search for GitHub users, view their details, repositories, starred repositories, and organizations. The app uses modern Android development practices and libraries to provide a smooth and efficient user experience.
 
